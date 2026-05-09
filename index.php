@@ -1,31 +1,36 @@
 <?php
-/**
- * CareDrop – index.php
- * Entry point utama aplikasi CareDrop
- * Rekayasa Perangkat Lunak – Universitas Mataram 2026
- */
+session_start();
 
-// Konfigurasi dasar (dapat diperluas ke koneksi DB)
 define('APP_NAME',    'CareDrop');
 define('APP_VERSION', '1.0.0');
 define('APP_DESC',    'Layanan Donasi Barang Layak Pakai Sesuaian Kebutuhan Penerima');
 
-// Simulasi session login (di produksi pakai PHP session/database)
+// Jika sudah login via session, siapkan data untuk JS
+$session_user = null;
+if (isset($_SESSION['id'], $_SESSION['role'], $_SESSION['nama'])) {
+    $session_user = [
+        'id'    => $_SESSION['id'],
+        'nama'  => $_SESSION['nama'],
+        'email' => $_SESSION['email'] ?? '',
+        'role'  => $_SESSION['role'],
+    ];
+}
+
 $demo_accounts = [
     'donatur' => [
         'name'  => 'Sabrina Salsabila',
         'email' => 'sabrina@email.com',
         'role'  => 'donatur',
     ],
-    'yayasan' => [
+    'penerima' => [
         'name'  => 'Panti Asuhan Al-Ikhlas',
         'email' => 'alikhlas@yayasan.id',
-        'role'  => 'yayasan',
+        'role'  => 'penerima',
     ],
-    'relawan' => [
-        'name'  => 'Budi Santoso',
-        'email' => 'budi.relawan@email.com',
-        'role'  => 'relawan',
+    'admin' => [
+        'name'  => 'Admin CareDrop',
+        'email' => 'admin@caredrop.id',
+        'role'  => 'admin',
     ],
 ];
 
@@ -52,15 +57,13 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
 <!-- ── Toast Notification ── -->
 <div id="toast"></div>
 
-<!-- ════════════════════════════════════════════
-     LANDING PAGE
-     ════════════════════════════════════════════ -->
+<!-- LANDING PAGE-->
 <div id="pg-landing">
   <nav class="land-nav">
     <div class="logo" onclick="show('pg-landing')">Care<em>Drop</em></div>
     <div style="display:flex;gap:7px">
       <button class="btn btn-ghost btn-sm" onclick="goLogin()">Masuk</button>
-      <button class="btn btn-green btn-sm" onclick="goLogin()">Daftar Gratis</button>
+      <button class="btn btn-green btn-sm" onclick="goRegister()">Daftar Gratis</button>
     </div>
   </nav>
 
@@ -75,8 +78,7 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
       </p>
       <div class="hero-btns">
         <button class="btn btn-wh" onclick="goLogin('donatur')">🤝 Saya Ingin Donasi</button>
-        <button class="btn btn-ow" onclick="goLogin('yayasan')">🏠 Daftarkan Yayasan</button>
-        <button class="btn btn-ow" style="border-color:rgba(234,88,12,.5);color:#fdba74" onclick="goLogin('relawan')">🚗 Jadi Relawan</button>
+        <button class="btn btn-ow" onclick="goLogin('penerima')">🏠 Daftarkan Yayasan/Posko</button>
       </div>
     </div>
     <div class="hero-cards">
@@ -103,52 +105,51 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
     </div>
     <div class="feat-g">
       <div class="fc"><div class="fc-i">🤝</div><h3>Donatur</h3><p>Pilih kebutuhan yayasan, unggah foto barang, jadwalkan penjemputan tanpa keluar rumah.</p></div>
-      <div class="fc"><div class="fc-i">🏠</div><h3>Yayasan / Panti Asuhan</h3><p>Buat katalog kebutuhan spesifik, konfirmasi donasi masuk, dan terima laporan otomatis.</p></div>
-      <div class="fc"><div class="fc-i">🚗</div><h3>Relawan Pengantar</h3><p>Ambil tugas penjemputan, navigasi GPS ke lokasi donatur, antar barang ke yayasan.</p></div>
-      <div class="fc"><div class="fc-i">📜</div><h3>E-Sertifikat</h3><p>Foto bukti + sertifikat elektronik diterbitkan otomatis saat yayasan konfirmasi penerimaan.</p></div>
+      <div class="fc"><div class="fc-i">🏠</div><h3>Penerima (Yayasan/Posko)</h3><p>Buat katalog kebutuhan spesifik, konfirmasi donasi masuk, dan terima laporan otomatis.</p></div>
+      <div class="fc"><div class="fc-i">⚙️</div><h3>Admin</h3><p>Kelola pengguna, verifikasi yayasan, pantau alur donasi, dan cetak laporan platform.</p></div>
     </div>
   </div>
 </div><!-- end pg-landing -->
 
 
-<!-- ════════════════════════════════════════════
-     LOGIN PAGE
-     ════════════════════════════════════════════ -->
 <div id="pg-login" class="hide">
   <div class="l-left">
     <div class="logo">Care<em>Drop</em></div>
     <h2>Selamat datang<br>kembali 👋</h2>
-    <p>Masuk dengan akun Anda sesuai peran — donatur, yayasan, atau relawan pengantar.</p>
+    <p>Masuk dengan akun Anda sesuai peran — donatur, penerima, atau admin.</p>
     <div class="role-pills">
       <div class="rp"><span>🤝</span><div><strong>Donatur</strong><em>Cari kebutuhan · Donasi · Lacak barang</em></div></div>
-      <div class="rp"><span>🏠</span><div><strong>Yayasan</strong><em>Kelola katalog · Konfirmasi donasi</em></div></div>
-      <div class="rp"><span>🚗</span><div><strong>Relawan</strong><em>Ambil tugas · Antar barang · Riwayat</em></div></div>
+      <div class="rp"><span>🏠</span><div><strong>Penerima</strong><em>Yayasan / Posko · Kelola katalog · Konfirmasi donasi</em></div></div>
+      <div class="rp"><span>⚙️</span><div><strong>Admin</strong><em>Kelola pengguna · Verifikasi · Laporan</em></div></div>
     </div>
   </div>
 
   <div class="l-right">
     <div class="lbox">
       <h3>Masuk ke <?= APP_NAME ?></h3>
-      <p class="subt">Pilih peran lalu gunakan akun demo di bawah</p>
+      <p class="subt">Masuk dengan akun terdaftar, atau coba akun demo</p>
 
       <!-- Role Tabs -->
       <div class="role-tabs">
         <button class="rt on"  id="tab-don" onclick="switchRole('donatur')">🤝 Donatur</button>
-        <button class="rt"     id="tab-yay" onclick="switchRole('yayasan')">🏠 Yayasan</button>
-        <button class="rt"     id="tab-rel" onclick="switchRole('relawan')">🚗 Relawan</button>
+        <button class="rt"     id="tab-pen" onclick="switchRole('penerima')">🏠 Penerima</button>
+        <button class="rt"     id="tab-adm" onclick="switchRole('admin')">⚙️ Admin</button>
       </div>
 
-      <div class="fg">
-        <label>Email</label>
-        <input type="email" id="l-email" placeholder="email@contoh.com">
-      </div>
-      <div class="fg">
-        <label>Kata Sandi</label>
-        <input type="password" id="l-pass" placeholder="••••••••">
-      </div>
-      <button class="btn btn-green" style="width:100%;justify-content:center;margin-top:2px" onclick="doLogin()">
-        Masuk →
-      </button>
+      <form action="backend/proses_login.php" method="POST">
+        <input type="hidden" name="role_hint" id="l-role-hint" value="donatur">
+        <div class="fg">
+          <label>Email</label>
+          <input type="email" name="email" id="l-email" placeholder="email@contoh.com" required>
+        </div>
+        <div class="fg">
+          <label>Kata Sandi</label>
+          <input type="password" name="password" id="l-pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-green" style="width:100%;justify-content:center;margin-top:2px">
+          Masuk →
+        </button>
+      </form>
 
       <div class="divider">atau gunakan akun demo</div>
 
@@ -161,18 +162,76 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
             <span><?= htmlspecialchars($acc['email']) ?> · demo123</span>
           </div>
           <?php
-            $tagClass = ['donatur'=>'tg','yayasan'=>'ta','relawan'=>'to'][$role];
-            $roleLabel = ['donatur'=>'Donatur','yayasan'=>'Yayasan','relawan'=>'Relawan'][$role];
+            $tagClass = ['donatur'=>'tg','penerima'=>'ta','admin'=>'tb'][$role] ?? 'tg';
+            $roleLabel = ['donatur'=>'Donatur','penerima'=>'Penerima','admin'=>'Admin'][$role] ?? $role;
           ?>
           <span class="tag <?= $tagClass ?>"><?= $roleLabel ?></span>
         </div>
         <?php endforeach; ?>
       </div>
 
-      <p class="sw">Belum punya akun? <a onclick="toast('Fitur daftar segera hadir!')">Daftar sekarang</a></p>
+      <p class="sw">Belum punya akun? <a onclick="goRegister()">Daftar sekarang</a></p>
+    </div><!-- end lbox -->
+  </div><!-- end l-right -->
+</div><!-- end pg-login -->
+
+<div id="pg-register" class="hide">
+  <div class="l-left" style="background: linear-gradient(150deg, var(--g3), var(--g1));">
+    <div class="logo">Care<em>Drop</em></div>
+    <h2>Mulai Langkah<br>Kebaikanmu 🤝</h2>
+    <p>Bergabunglah menjadi bagian dari ekosistem donasi yang transparan, mudah, dan tepat sasaran.</p>
+  </div>
+
+  <div class="l-right">
+    <div class="lbox" style="max-width: 420px;">
+      <h3>Daftar Akun Baru</h3>
+      <p class="subt">Lengkapi data diri untuk mulai bergabung</p>
+
+      <form action="backend/proses_registrasi.php" method="POST">
+        <div class="fg">
+          <label>Nama Lengkap</label>
+          <input type="text" name="nama_lengkap" id="r-nama" placeholder="Budi Santoso" required>
+        </div>
+        <div class="fg">
+          <label>Email</label>
+          <input type="email" name="email" id="r-email" placeholder="email@contoh.com" required>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="fg">
+            <label>Kata Sandi</label>
+            <input type="password" name="password" id="r-pass" placeholder="min. 6 karakter" required minlength="6">
+          </div>
+          <div class="fg">
+            <label>Konfirmasi Sandi</label>
+            <input type="password" name="password_confirm" id="r-pass2" placeholder="ulangi sandi" required>
+          </div>
+        </div>
+        <div class="fg">
+          <label>No. Telepon / WA</label>
+          <input type="tel" name="no_telp" id="r-telp" placeholder="0812xxxx" required>
+        </div>
+        <div class="fg">
+          <label>Daftar Sebagai</label>
+          <select name="role" id="r-role" required style="width:100%;padding:9px 13px;border:1px solid var(--bord);border-radius:8px;font-family:inherit;font-size:.9rem;background:var(--white);color:var(--text)">
+            <option value="" disabled selected>— Pilih Peran —</option>
+            <option value="donatur">🤝 Donatur Pribadi</option>
+            <option value="penerima">🏠 Yayasan / Posko Penerima</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Alamat Lengkap</label>
+          <textarea name="alamat" id="r-alamat" placeholder="Jalan, RT/RW, Kecamatan..." rows="2" required style="width:100%;padding:9px 13px;border:1px solid var(--bord);border-radius:8px;font-family:inherit;font-size:.9rem;resize:none"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-green" style="width:100%;justify-content:center;margin-top:8px" onclick="return validateRegister()">
+          Daftar Sekarang →
+        </button>
+      </form>
+
+      <p class="sw">Sudah punya akun? <a onclick="goLogin()">Masuk di sini</a></p>
     </div>
   </div>
-</div><!-- end pg-login -->
+</div>
 
 
 <!-- ════════════════════════════════════════════
@@ -308,7 +367,7 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
           <div class="fcard-t"><span class="sn">3</span>Yayasan Tujuan</div>
           <div class="fg2">
             <label>Pilih Yayasan</label>
-            <select>
+            <select id="pilih-yayasan">
               <option>— Pilih Yayasan —</option>
               <option selected>Panti Asuhan Al-Ikhlas, Mataram</option>
               <option>Yayasan Peduli Anak NTB, Lombok</option>
@@ -318,91 +377,58 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
           </div>
         </div>
 
-        <div class="fcard">
-          <div class="fcard-t"><span class="sn">4</span>Jadwal Penjemputan</div>
-          <div class="fg2">
-            <label>Lokasi Penjemputan</label>
-            <div class="mapbox" onclick="toast('Peta GPS dibuka — tandai lokasimu')">
-              <span class="mi">📍</span>
-              <span>Ketuk untuk pilih lokasi di peta</span>
+ <div class="fcard">
+          <div class="fcard-t"><span class="sn">4</span>Pengiriman & Logistik Terintegrasi</div>
+          <div class="frow">
+            <div class="fg2">
+              <label>Kota Asal Penjemputan</label>
+              <select id="kota-asal">
+                <option value="Mataram" selected>Mataram</option>
+                <option value="Praya">Praya</option>
+                <option value="Selong">Selong</option>
+              </select>
+            </div>
+            <div class="fg2">
+              <label>Estimasi Berat/Dimensi (Kg)</label>
+              <input type="number" id="berat-barang" value="2" min="1" max="100">
             </div>
           </div>
-          <div class="fg2"><label>Alamat Detail</label><input type="text" placeholder="Jalan, no rumah, RT/RW"></div>
           <div class="fg2">
-            <label>Pilih Waktu</label>
-            <div class="slots">
-              <button class="slot" onclick="pickSlot(this)">Senin 08–12</button>
-              <button class="slot on" onclick="pickSlot(this)">Selasa 08–12</button>
-              <button class="slot" onclick="pickSlot(this)">Selasa 13–17</button>
-              <button class="slot" onclick="pickSlot(this)">Rabu 08–12</button>
-              <button class="slot" onclick="pickSlot(this)">Rabu 13–17</button>
-            </div>
+            <label>Alamat Lengkap Penjemputan</label>
+            <input type="text" placeholder="Jalan, no rumah, RT/RW">
           </div>
+          
+          <div class="fg2" style="margin-top:20px; padding-top:15px; border-top:1px dashed var(--bord);">
+            <button class="btn btn-outline" style="width:100%; justify-content:center" onclick="hitungEstimasiPengiriman()">
+              📍 Cari Kurir & Estimasi Ongkir
+            </button>
+          </div>
+          
+          <div id="courier-result" style="margin-top: 15px;"></div>
         </div>
 
         <div style="display:flex;justify-content:flex-end;gap:9px">
           <button class="btn btn-ghost" onclick="nav('d-kat')">Batal</button>
           <button class="btn btn-green" onclick="submitDon()">🎁 Daftarkan Donasi</button>
         </div>
+      </div> </div><div class="inner-page" id="ip-d-lacak">
+      <div class="ph">
+        <h2>Lacak Pengiriman</h2>
+        <p>Pantau perjalanan barang donasi via Nomor Resi Terintegrasi</p>
       </div>
-    </div><!-- end d-don -->
-
-    <!-- Lacak Donasi -->
-    <div class="inner-page" id="ip-d-lacak">
-      <div class="ph"><h2>Lacak Donasi</h2><p>Pantau perjalanan barangmu secara real-time</p></div>
       <div class="tbox">
         <div class="tsrch">
-          <input type="text" placeholder="ID donasi (cth: CDR-20260401-001)">
-          <button class="btn btn-green" onclick="showTrack()">Lacak</button>
+          <input type="text" id="input-resi" placeholder="Masukkan Nomor Resi (cth: CDJNT9281ID)">
+          <button class="btn btn-green" onclick="showTrack()">Lacak Resi</button>
         </div>
         <div id="tr-empty" style="text-align:center;padding:42px 0">
-          <div style="font-size:42px;margin-bottom:9px">📦</div>
-          <p style="font-weight:700;color:var(--g1)">Masukkan ID Donasi</p>
-          <p style="font-size:.84rem;color:var(--text2);margin-top:3px">ID dikirim ke email setelah donasi terdaftar</p>
-          <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="showTrack()">Lihat Contoh</button>
+          <div style="font-size:42px;margin-bottom:9px">🚚</div>
+          <p style="font-weight:700;color:var(--g1)">Lacak Otomatis</p>
+          <p style="font-size:.84rem;color:var(--text2);margin-top:3px">Didukung oleh JNE, J&T, GoSend, GrabExpress, & Pos Indonesia</p>
         </div>
         <div id="tr-result" class="hide">
-          <!-- Donasi 1: Dalam Perjalanan -->
-          <div class="dcrd">
-            <div class="dc-head">
-              <div><div class="dc-id">CDR-20260404-007</div><div class="dc-ttl">3 Buku Pelajaran SD — Yayasan Peduli Anak NTB</div></div>
-              <span class="tag ta">🚗 Dalam Perjalanan</span>
-            </div>
-            <div class="tl">
-              <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-con"><h4>Donasi Terdaftar</h4><p>Sabrina · Mataram</p><time>4 Apr 2026, 08.40</time></div></div>
-              <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-con"><h4>Relawan Ditugaskan</h4><p>Budi Santoso (Honda Beat)</p><time>4 Apr 2026, 09.20</time></div></div>
-              <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-con"><h4>Barang Dijemput</h4><time>4 Apr 2026, 10.15</time></div></div>
-              <div class="tl-item"><div class="tl-dot cur">→</div><div class="tl-con"><h4>Dalam Perjalanan ke Yayasan</h4><p>Estimasi tiba ±30 menit</p><time>4 Apr 2026, 10.50</time></div></div>
-              <div class="tl-item"><div class="tl-dot" style="color:var(--text3);font-size:9px">···</div><div class="tl-con"><h4 style="color:var(--text3)">Menunggu Konfirmasi Yayasan</h4></div></div>
-            </div>
           </div>
-          <!-- Donasi 2: Selesai -->
-          <div class="dcrd">
-            <div class="dc-head">
-              <div><div class="dc-id">CDR-20260401-001</div><div class="dc-ttl">5 Seragam SD — Panti Asuhan Al-Ikhlas</div></div>
-              <span class="tag tg">✓ Selesai</span>
-            </div>
-            <div class="tl">
-              <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-con"><h4>Donasi Terdaftar</h4><time>1 Apr 2026, 09.12</time></div></div>
-              <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-con"><h4>Barang Dijemput</h4><time>1 Apr 2026, 11.30</time></div></div>
-              <div class="tl-item">
-                <div class="tl-dot done">✓</div>
-                <div class="tl-con">
-                  <h4>Diterima Yayasan</h4>
-                  <p>Panti Asuhan Al-Ikhlas · Jl. Pejanggik No.12</p>
-                  <time>1 Apr 2026, 14.20</time>
-                  <div class="proof">📸 foto-serah-terima-CDR-001.jpg — tersimpan</div>
-                </div>
-              </div>
-            </div>
-            <div class="cert">
-              <div><p>E-Sertifikat Diterbitkan</p><h4>CERT-CDR-20260401-001</h4></div>
-              <button class="btn btn-green btn-sm" onclick="toast('Mengunduh E-Sertifikat…')">⬇ Unduh</button>
-            </div>
-          </div>
-        </div>
       </div>
-    </div><!-- end d-lacak -->
 
     <!-- Profil Donatur -->
     <div class="inner-page" id="ip-d-profil">
@@ -434,12 +460,12 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
   </div><!-- end rd -->
 
 
-  <!-- ════════ ROLE: YAYASAN ════════ -->
+  <!-- ════════ ROLE: PENERIMA ════════ -->
   <div id="ry" class="hide">
 
-    <!-- Dashboard Yayasan -->
+    <!-- Dashboard Penerima -->
     <div class="inner-page" id="ip-y-home">
-      <div class="ph"><h2>Dashboard Yayasan</h2><p>Panti Asuhan Al-Ikhlas · Mataram, NTB</p></div>
+      <div class="ph"><h2>Dashboard Penerima</h2><p>Panti Asuhan Al-Ikhlas · Mataram, NTB</p></div>
       <div class="wrap">
         <div class="stat-row">
           <div class="sc"><label>Total Donasi Diterima</label><big>142</big><small>sejak bergabung</small></div>
@@ -555,163 +581,161 @@ $page_title = APP_NAME . ' – ' . APP_DESC;
   </div><!-- end ry -->
 
 
-  <!-- ════════ ROLE: RELAWAN ════════ -->
-  <div id="rr" class="hide">
 
-    <!-- Dashboard Relawan -->
-    <div class="inner-page" id="ip-r-home">
-      <div class="ph" style="background:linear-gradient(135deg,#3d1a00,#7c3a0a)">
-        <h2>Dashboard Relawan</h2>
-        <p>Budi Santoso · Relawan Aktif · Mataram, NTB</p>
+  <!-- ════════ ROLE: ADMIN ════════ -->
+  <div id="ra" class="hide">
+
+    <!-- Dashboard Admin -->
+    <div class="inner-page" id="ip-a-home">
+      <div class="ph" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <h2>Dashboard Admin</h2>
+        <p>Admin CareDrop · Pantau & kelola seluruh aktivitas platform</p>
       </div>
       <div class="wrap">
         <div class="stat-row">
-          <div class="sc"><label>Total Antar Selesai</label><big id="rel-stat-selesai">2</big><small>sejak bergabung</small></div>
-          <div class="sc sc-o"><label>Tugas Aktif</label><big id="rel-stat-aktif">0</big><small>sedang berjalan</small></div>
-          <div class="sc sc-b"><label>Tugas Menunggu</label><big id="rel-stat-pending">3</big><small>bisa diambil</small></div>
-          <div class="sc"><label>Total Jarak Tempuh</label><big id="rel-stat-km">6.4</big><small>km ditempuh</small></div>
+          <div class="sc"><label>Total Pengguna</label><big>412</big><small>terdaftar</small></div>
+          <div class="sc sc-a"><label>Donasi Aktif</label><big>38</big><small>sedang berjalan</small></div>
+          <div class="sc sc-b"><label>Penerima Terverif.</label><big>38</big><small>yayasan/posko</small></div>
+          <div class="sc"><label>Total Barang</label><big>1.240</big><small>tersalurkan</small></div>
         </div>
 
-        <!-- Status kendaraan & ketersediaan -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-          <div class="fcard" style="margin-bottom:0">
-            <div class="fcard-t" style="margin-bottom:14px">🚗 Kendaraan Saya</div>
-            <div style="font-size:.88rem;color:var(--text2)">
-              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--surf)"><span>Jenis</span><strong>Sepeda Motor</strong></div>
-              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--surf)"><span>Plat</span><strong>DR 1234 AB</strong></div>
-              <div style="display:flex;justify-content:space-between;padding:6px 0"><span>Warna</span><strong>Hitam</strong></div>
-            </div>
-          </div>
-          <div class="fcard" style="margin-bottom:0">
-            <div class="fcard-t" style="margin-bottom:14px">📶 Status Ketersediaan</div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-                <input type="radio" name="status-rel" checked onchange="toast('Status: Online — kamu akan menerima tugas baru')"> Online (siap menerima tugas)
-              </label>
-              <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-                <input type="radio" name="status-rel" onchange="toast('Status: Istirahat — tidak menerima tugas sementara')"> Istirahat sementara
-              </label>
-              <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-                <input type="radio" name="status-rel" onchange="toast('Status: Offline')"> Offline
-              </label>
-            </div>
-          </div>
+        <div class="tcrd" style="margin-bottom:18px">
+          <div class="thead"><h3>⚡ Permintaan Verifikasi Penerima</h3><span class="tag ta">3 menunggu</span></div>
+          <table>
+            <thead><tr><th>Nama</th><th>Jenis</th><th>Kota</th><th>Daftar</th><th>Aksi</th></tr></thead>
+            <tbody>
+              <tr><td>Rumah Belajar Cahaya</td><td>Posko Pendidikan</td><td>Mataram</td><td>2 Mei 2026</td><td><button class="btn btn-green btn-xs" onclick="toast('✅ Akun diverifikasi')">Verifikasi</button></td></tr>
+              <tr><td>Yayasan Tunas Bangsa</td><td>Panti Asuhan</td><td>Praya</td><td>4 Mei 2026</td><td><button class="btn btn-green btn-xs" onclick="toast('✅ Akun diverifikasi')">Verifikasi</button></td></tr>
+              <tr><td>Posko Bencana NTB</td><td>Posko Darurat</td><td>Selong</td><td>8 Mei 2026</td><td><button class="btn btn-green btn-xs" onclick="toast('✅ Akun diverifikasi')">Verifikasi</button></td></tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="tcrd">
-          <div class="thead"><h3>Tugas Terbaru</h3><button class="btn btn-orange btn-sm" onclick="nav('r-jobs')">Lihat Semua Tugas</button></div>
+          <div class="thead"><h3>Donasi Terbaru</h3><button class="btn btn-green btn-sm" onclick="nav('a-donasi')">Lihat Semua</button></div>
           <table>
-            <thead><tr><th>ID</th><th>Barang</th><th>Rute</th><th>Jarak</th><th>Status</th></tr></thead>
+            <thead><tr><th>ID</th><th>Donatur</th><th>Penerima</th><th>Barang</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260404-007</td><td>3 Buku Pelajaran SD</td><td>Cakranegara → Ampenan</td><td>4.2 km</td><td><span class="tag tb">Menunggu</span></td></tr>
-              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260320-003</td><td>Tas Sekolah 2 buah</td><td>Mataram → Al-Ikhlas</td><td>2.1 km</td><td><span class="tag tg">Selesai</span></td></tr>
+              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260508-021</td><td>Sabrina S.</td><td>Al-Ikhlas</td><td>5 Seragam SD</td><td><span class="tag tg">Selesai</span></td></tr>
+              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260507-018</td><td>Andi W.</td><td>Peduli Anak NTB</td><td>3 Buku SD</td><td><span class="tag ta">Proses</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div><!-- end r-home -->
+    </div><!-- end a-home -->
 
-    <!-- Daftar Tugas Jemput -->
-    <div class="inner-page" id="ip-r-jobs">
-      <div class="ph" style="background:linear-gradient(135deg,#3d1a00,#7c3a0a)">
-        <h2>Tugas Penjemputan Tersedia</h2>
-        <p>Pilih tugas yang ingin kamu ambil berdasarkan lokasi dan waktu</p>
-      </div>
-      <div class="wrap">
-        <div class="job-grid" id="jobs-grid">
-          <p style="color:var(--text2);padding:16px">Memuat tugas...</p>
-        </div>
-      </div>
-    </div><!-- end r-jobs -->
-
-    <!-- Tugas Aktif (Sedang Berjalan) -->
-    <div class="inner-page" id="ip-r-aktif">
-      <div class="ph" style="background:linear-gradient(135deg,#3d1a00,#7c3a0a)">
-        <h2>Tugas Sedang Berjalan</h2>
-        <p>Perbarui status pengantaran barang secara bertahap</p>
-      </div>
-      <div class="wrap" style="max-width:720px">
-        <div id="active-job-container">
-          <div style="text-align:center;padding:48px 24px">
-            <div style="font-size:42px;margin-bottom:10px">🚗</div>
-            <p style="font-weight:700;color:var(--g1)">Belum ada tugas aktif</p>
-            <p style="font-size:.85rem;color:var(--text2);margin-top:4px">Ambil tugas dari halaman "Tugas Jemput" terlebih dahulu</p>
-            <button class="btn btn-orange btn-sm" style="margin-top:14px" onclick="nav('r-jobs')">Lihat Tugas Tersedia</button>
-          </div>
-        </div>
-      </div>
-    </div><!-- end r-aktif -->
-
-    <!-- Riwayat Relawan -->
-    <div class="inner-page" id="ip-r-hist">
-      <div class="ph" style="background:linear-gradient(135deg,#3d1a00,#7c3a0a)">
-        <h2>Riwayat Pengantaran</h2>
-        <p>Semua tugas yang pernah kamu selesaikan</p>
+    <!-- Kelola Pengguna -->
+    <div class="inner-page" id="ip-a-users">
+      <div class="ph" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <h2>Kelola Pengguna</h2>
+        <p>Lihat, nonaktifkan, atau hapus akun pengguna platform</p>
       </div>
       <div class="wrap">
         <div class="tcrd">
           <div class="thead">
-            <h3>Semua Pengantaran</h3>
-            <div style="display:flex;align-items:center;gap:6px;font-size:.83rem;color:var(--text2)">
-              Total jarak: <strong style="color:var(--g3)" id="rel-total-km">6.4 km</strong>
-            </div>
+            <h3>Semua Pengguna</h3>
+            <input type="text" placeholder="Cari nama / email..." style="padding:7px 12px;border:1px solid var(--bord);border-radius:8px;font-size:.85rem;font-family:inherit" oninput="toast('Mencari: '+this.value)">
           </div>
           <table>
-            <thead><tr><th>ID</th><th>Barang</th><th>Donatur</th><th>Yayasan</th><th>Tanggal</th><th>Jarak</th><th>Rating</th></tr></thead>
-            <tbody id="rel-hist-tbody">
-              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260320-003</td><td>Tas Sekolah 2 buah</td><td>Dian Permata</td><td>Al-Ikhlas</td><td>20 Mar 2026</td><td>2.1 km</td><td>⭐⭐⭐⭐⭐</td></tr>
-              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260328-009</td><td>4 Buku Cerita Anak</td><td>Hari Purnomo</td><td>Yayasan Peduli Anak</td><td>28 Mar 2026</td><td>3.7 km</td><td>⭐⭐⭐⭐⭐</td></tr>
+            <thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Daftar</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>
+              <tr><td>Sabrina Salsabila</td><td>sabrina@email.com</td><td><span class="tag tg">Donatur</span></td><td>Jan 2026</td><td><span class="tag tg">Aktif</span></td><td><button class="btn btn-ghost btn-xs" onclick="toast('Detail akun dibuka')">Detail</button></td></tr>
+              <tr><td>Panti Asuhan Al-Ikhlas</td><td>alikhlas@yayasan.id</td><td><span class="tag ta">Penerima</span></td><td>Feb 2026</td><td><span class="tag tg">Aktif</span></td><td><button class="btn btn-ghost btn-xs" onclick="toast('Detail akun dibuka')">Detail</button></td></tr>
+              <tr><td>Rumah Belajar Cahaya</td><td>cahaya@posko.id</td><td><span class="tag ta">Penerima</span></td><td>Mei 2026</td><td><span class="tag ta">Menunggu</span></td><td><button class="btn btn-ghost btn-xs" onclick="toast('Detail akun dibuka')">Detail</button></td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div><!-- end r-hist -->
+    </div><!-- end a-users -->
 
-    <!-- Profil Relawan -->
-    <div class="inner-page" id="ip-r-profil">
-      <div class="ph" style="background:linear-gradient(135deg,#3d1a00,#7c3a0a)">
-        <h2>Profil Relawan</h2>
+    <!-- Kelola Donasi -->
+    <div class="inner-page" id="ip-a-donasi">
+      <div class="ph" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <h2>Semua Donasi</h2>
+        <p>Pantau dan kelola seluruh transaksi donasi</p>
       </div>
-      <div class="wrap" style="max-width:620px">
-        <div class="pcrd">
-          <div class="pav" style="background:linear-gradient(135deg,#7c3a0a,var(--orange))">🚗</div>
-          <div class="pinf">
-            <h3>Budi Santoso</h3>
-            <p>budi.relawan@email.com · 0813-5555-7777</p>
-            <span class="tag to rt2">Relawan Aktif</span>
-          </div>
+      <div class="wrap">
+        <div class="tcrd">
+          <div class="thead"><h3>Daftar Donasi</h3><span class="tag tg">38 aktif</span></div>
+          <table>
+            <thead><tr><th>ID</th><th>Donatur</th><th>Penerima</th><th>Barang</th><th>Tanggal</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260508-021</td><td>Sabrina S.</td><td>Al-Ikhlas</td><td>5 Seragam SD</td><td>8 Mei 2026</td><td><span class="tag tg">Selesai</span></td></tr>
+              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260507-018</td><td>Andi W.</td><td>Peduli Anak NTB</td><td>3 Buku SD</td><td>7 Mei 2026</td><td><span class="tag ta">Proses</span></td></tr>
+              <tr><td style="font-family:monospace;font-size:.76rem">CDR-20260506-015</td><td>Rini H.</td><td>Al-Ikhlas</td><td>2 Tas Sekolah</td><td>6 Mei 2026</td><td><span class="tag tg">Selesai</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- end a-donasi -->
+
+    <!-- Verifikasi Penerima -->
+    <div class="inner-page" id="ip-a-verif">
+      <div class="ph" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <h2>Verifikasi Penerima</h2>
+        <p>Tinjau dan verifikasi pendaftaran yayasan & posko baru</p>
+      </div>
+      <div class="wrap">
+        <div class="tcrd">
+          <div class="thead"><h3>Menunggu Verifikasi</h3><span class="tag ta">3 pending</span></div>
+          <table>
+            <thead><tr><th>Nama</th><th>Jenis</th><th>Kota</th><th>Kontak</th><th>Dok. Legalitas</th><th>Aksi</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Rumah Belajar Cahaya</td><td>Posko Pendidikan</td><td>Mataram</td><td>0812-0001-1111</td>
+                <td><button class="btn btn-ghost btn-xs" onclick="toast('Membuka dokumen SK...')">📄 Lihat SK</button></td>
+                <td style="display:flex;gap:6px;padding:10px 0">
+                  <button class="btn btn-green btn-xs" onclick="toast('✅ Rumah Belajar Cahaya diverifikasi')">Setujui</button>
+                  <button class="btn btn-red btn-xs" onclick="toast('❌ Ditolak')">Tolak</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Yayasan Tunas Bangsa</td><td>Panti Asuhan</td><td>Praya</td><td>0813-0002-2222</td>
+                <td><button class="btn btn-ghost btn-xs" onclick="toast('Membuka dokumen SK...')">📄 Lihat SK</button></td>
+                <td style="display:flex;gap:6px;padding:10px 0">
+                  <button class="btn btn-green btn-xs" onclick="toast('✅ Yayasan Tunas Bangsa diverifikasi')">Setujui</button>
+                  <button class="btn btn-red btn-xs" onclick="toast('❌ Ditolak')">Tolak</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- end a-verif -->
+
+    <!-- Laporan -->
+    <div class="inner-page" id="ip-a-lap">
+      <div class="ph" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <h2>Laporan Platform</h2>
+        <p>Ringkasan statistik dan aktivitas CareDrop</p>
+      </div>
+      <div class="wrap">
+        <div class="stat-row">
+          <div class="sc"><label>Donasi Bulan Ini</label><big>87</big><small>transaksi</small></div>
+          <div class="sc sc-a"><label>Nilai Barang Est.</label><big>Rp 24jt</big><small>perkiraan nilai</small></div>
+          <div class="sc sc-b"><label>Penerima Aktif</label><big>38</big><small>yayasan/posko</small></div>
+          <div class="sc"><label>Tingkat Tepat Sasaran</label><big>97%</big><small>sesuai kebutuhan</small></div>
         </div>
         <div class="fcard">
-          <div class="fcard-t" style="margin-bottom:17px">Data Diri &amp; Kendaraan</div>
-          <div class="frow">
-            <div class="fg2"><label>Nama Lengkap</label><input value="Budi Santoso"></div>
-            <div class="fg2"><label>No. Telepon</label><input value="0813-5555-7777"></div>
+          <div class="fcard-t" style="margin-bottom:14px">📊 Ekspor Laporan</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-green btn-sm" onclick="toast('📥 Mengunduh laporan donasi bulan ini...')">📥 Laporan Bulan Ini (PDF)</button>
+            <button class="btn btn-ghost btn-sm" onclick="toast('📥 Mengunduh rekap tahunan...')">📥 Rekap Tahunan (Excel)</button>
+            <button class="btn btn-ghost btn-sm" onclick="toast('📧 Laporan dikirim ke email admin')">📧 Kirim ke Email</button>
           </div>
-          <div class="fg2"><label>Area Operasional</label><input value="Kota Mataram &amp; sekitarnya"></div>
-          <div class="frow">
-            <div class="fg2">
-              <label>Jenis Kendaraan</label>
-              <select><option selected>Sepeda Motor</option><option>Mobil / Pickup</option><option>Sepeda</option></select>
-            </div>
-            <div class="fg2"><label>No. Plat Kendaraan</label><input value="DR 1234 AB"></div>
-          </div>
-          <div class="fg2">
-            <label>SIM (foto)</label>
-            <div class="up-box" onclick="toast('Upload foto SIM')"><div class="ui">📄</div><p>Upload foto SIM</p><span>JPG, PNG – maks 3MB</span></div>
-          </div>
-          <button class="btn btn-green btn-sm" onclick="toast('Profil relawan diperbarui!')">Simpan</button>
-        </div>
-        <div style="text-align:right;margin-top:10px">
-          <button class="btn btn-red btn-sm" onclick="doLogout()">Keluar Akun</button>
         </div>
       </div>
-    </div><!-- end r-profil -->
+    </div><!-- end a-lap -->
 
-  </div><!-- end rr -->
+  </div><!-- end ra -->
 
 </div><!-- end pg-app -->
 
 <!-- JavaScript -->
+<script>
+// Data session dari PHP (null jika belum login)
+const PHP_SESSION = <?= json_encode($session_user) ?>;
+</script>
 <script src="app.js"></script>
 
 </body>

@@ -267,7 +267,7 @@ input:focus, select:focus, textarea:focus {
    LOGIN PAGE
    ============================================= */
 
-#pg-login { min-height: 100vh; display: flex; align-items: stretch; }
+#pg-login, #pg-register { min-height: 100vh; display: flex; align-items: stretch; }
 
 .l-left {
   flex: 1;
@@ -830,4 +830,56 @@ tr:hover td { background: #f7fdf9; }
   .si { flex: 1 1 110px; }
   #app-nav button { padding: 6px 8px; font-size: .76rem; }
   .job-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Courier Engine UI ── */
+.courier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.courier-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: var(--white);
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.courier-card:hover {
+  border-color: var(--g5);
+  background: var(--surf);
+}
+.courier-card.on {
+  border-color: var(--g4);
+  background: var(--g9);
+  box-shadow: 0 4px 12px rgba(34, 139, 69, 0.15);
+}
+.cc-ico {
+  font-size: 28px;
+  background: var(--surf);
+  width: 50px; height: 50px;
+  display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 10px;
+}
+.cc-info {
+  flex: 1;
+}
+.cc-info h4 {
+  font-size: 0.95rem;
+  color: var(--g1);
+  margin-bottom: 2px;
+}
+.cc-info span {
+  font-size: 0.75rem;
+  color: var(--text3);
+}
+.cc-price {
+  font-weight: 800;
+  color: var(--g3);
+  font-size: 1.05rem;
 }

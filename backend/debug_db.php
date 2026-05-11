@@ -1,9 +1,4 @@
 <?php
-/**
- * CareDrop – backend/debug_db.php
- * HAPUS FILE INI SETELAH SELESAI DEBUG!
- * Akses: http://localhost/caredrop/CareDrop/backend/debug_db.php
- */
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

@@ -1,46 +1,51 @@
 <?php
-require_once 'koneksi.php';
+require_once __DIR__ . '/koneksi.php';
 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $nama = htmlspecialchars($_POST['nama_lengkap']);
-    $email = htmlspecialchars($_POST['email']);
-    $no_telp = htmlspecialchars($_POST['no_telp']);
-    $alamat = htmlspecialchars($_POST['alamat']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    
-    // Tangkap pilihan role dari form
-    $role = $_POST['role']; 
-    
-    // Logika verifikasi: Penerima (yayasan/posko) harus menunggu ACC Admin, Donatur langsung aktif
-    $status_verifikasi = ($role === 'penerima') ? 'pending' : 'verified';
-
-    if (empty($nama) || empty($email) || empty($_POST['password']) || empty($no_telp) || empty($role)) {
-        echo "<script>alert('ERROR: ISI SEMUA DATA TERLEBIH DAHULU!'); window.location.href='../index.php';</script>";
-    } else {
-        $query = "INSERT INTO users (nama_lengkap, email, password, no_telp, alamat, role, status_verifikasi) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $koneksi->prepare($query);
-        $stmt->bind_param("sssssss", $nama, $email, $password, $no_telp, $alamat, $role, $status_verifikasi);
-        
-        try {
-            if($stmt->execute()){
-                if ($role === 'penerima') {
-                    echo "<script>alert('Registrasi Berhasil! Akun Penerima Anda sedang menunggu verifikasi Admin.'); window.location.href='../index.php';</script>";
-                } else {
-                    echo "<script>alert('Registrasi CareDrop Berhasil! Selamat datang, " . $nama . "'); window.location.href='../index.php';</script>";
-                }
-            }
-        } catch (mysqli_sql_exception $e) {
-            if ($e->getCode() == 1062) { 
-                echo "<script>alert('ERROR: EMAIL SUDAH TERDAFTAR!'); window.location.href='../index.php';</script>";
-            } else {
-                echo "Error saat registrasi: " . $e->getMessage();
-            }
-        }
-        $stmt->close();
-    }
-} else {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../index.php');
-    exit();
+    exit;
 }
+
+$nama     = htmlspecialchars(trim($_POST['nama_lengkap'] ?? ''));
+$email    = htmlspecialchars(trim($_POST['email'] ?? ''));
+$no_telp  = htmlspecialchars(trim($_POST['no_telp'] ?? ''));
+$alamat   = htmlspecialchars(trim($_POST['alamat'] ?? ''));
+$role     = $_POST['role'] ?? '';
+$password = $_POST['password'] ?? '';
+
+if (empty($nama) || empty($email) || empty($password) || empty($no_telp) || empty($role)) {
+    echo "<script>alert('ERROR: ISI SEMUA DATA TERLEBIH DAHULU!'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+if (strlen($password) < 6) {
+    echo "<script>alert('Sandi minimal 6 karakter!'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+$hashed           = password_hash($password, PASSWORD_DEFAULT);
+$status_verifikasi = ($role === 'penerima') ? 'pending' : 'verified';
+
+$stmt = $koneksi->prepare(
+    "INSERT INTO users (nama_lengkap, email, password, no_telp, alamat, role, status_verifikasi)
+     VALUES (?, ?, ?, ?, ?, ?, ?)"
+);
+$stmt->bind_param("sssssss", $nama, $email, $hashed, $no_telp, $alamat, $role, $status_verifikasi);
+
+try {
+    if ($stmt->execute()) {
+        $msg = ($role === 'penerima')
+            ? 'Registrasi Berhasil! Akun Penerima Anda sedang menunggu verifikasi Admin.'
+            : 'Registrasi CareDrop Berhasil! Selamat datang, ' . $nama;
+        echo "<script>alert('" . addslashes($msg) . "'); window.location.href='../index.php';</script>";
+    }
+} catch (mysqli_sql_exception $e) {
+    if ($e->getCode() == 1062) {
+        echo "<script>alert('ERROR: EMAIL SUDAH TERDAFTAR!'); window.location.href='../index.php';</script>";
+    } else {
+        echo "<script>alert('Terjadi kesalahan: " . addslashes($e->getMessage()) . "'); window.location.href='../index.php';</script>";
+    }
+}
+
+$stmt->close();
 $koneksi->close();
-?>

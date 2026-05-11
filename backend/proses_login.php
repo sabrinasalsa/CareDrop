@@ -1,46 +1,50 @@
 <?php
 session_start();
-require_once 'koneksi.php';
+require_once __DIR__ . '/koneksi.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = htmlspecialchars($_POST['email']);
-    $password = $_POST['password'];
-
-    $query = "SELECT * FROM users WHERE email = ?";
-    $stmt = $koneksi->prepare($query);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-
-        if(password_verify($password, $row['password'])) {
-            // Simpan data user ke session (termasuk no_telp dan alamat untuk profil)
-            $_SESSION['id']      = $row['id'];
-            $_SESSION['nama']    = $row['nama_lengkap'];
-            $_SESSION['email']   = $row['email'];
-            $_SESSION['role']    = $row['role'];
-            $_SESSION['no_telp'] = $row['no_telp']  ?? '';
-            $_SESSION['alamat']  = $row['alamat']   ?? '';
-
-            // Cek status verifikasi untuk penerima
-            if ($row['role'] === 'penerima' && isset($row['status_verifikasi']) && $row['status_verifikasi'] === 'pending') {
-                echo "<script>alert('Akun Anda masih menunggu verifikasi Admin. Silakan tunggu konfirmasi.'); window.location.href='../index.php';</script>";
-                exit;
-            }
-
-            // Redirect ke index — JS akan auto-login lewat PHP_SESSION
-            header("Location: ../index.php");
-            exit;
-
-        } else {
-            echo "<script>alert('Kata sandi salah!'); window.location.href='../index.php';</script>";
-        }
-    } else {
-        echo "<script>alert('Email tidak ditemukan!'); window.location.href='../index.php';</script>";
-    }
-    $stmt->close();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../index.php');
+    exit;
 }
+
+$email    = htmlspecialchars(trim($_POST['email'] ?? ''));
+$password = $_POST['password'] ?? '';
+
+if (empty($email) || empty($password)) {
+    echo "<script>alert('Email dan sandi wajib diisi!'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+$stmt = $koneksi->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$row = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+if (!$row) {
+    echo "<script>alert('Email tidak ditemukan!'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+if (!password_verify($password, $row['password'])) {
+    echo "<script>alert('Kata sandi salah!'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+// Cek verifikasi penerima
+if ($row['role'] === 'penerima' && ($row['status_verifikasi'] ?? '') === 'pending') {
+    echo "<script>alert('Akun Anda masih menunggu verifikasi Admin. Silakan tunggu konfirmasi.'); window.location.href='../index.php';</script>";
+    exit;
+}
+
+// Set session
+$_SESSION['id']      = $row['id'];
+$_SESSION['nama']    = $row['nama_lengkap'];
+$_SESSION['email']   = $row['email'];
+$_SESSION['role']    = $row['role'];
+$_SESSION['no_telp'] = $row['no_telp']  ?? '';
+$_SESSION['alamat']  = $row['alamat']   ?? '';
+
 $koneksi->close();
-?>
+header('Location: ../index.php');
+exit;

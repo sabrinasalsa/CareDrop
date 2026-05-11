@@ -176,10 +176,22 @@ async function loadDashboard(r) {
   try {
     const res = await fetch('backend/dashboard_data.php', { credentials:'same-origin' });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    // Baca teks dulu untuk debug jika bukan JSON
+    const rawText = await res.text();
 
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      // Tampilkan preview teks untuk membantu debug
+      const preview = rawText.substring(0, 200).replace(/</g,'&lt;');
+      console.error('[CareDrop] Bukan JSON. Preview:', rawText.substring(0, 300));
+      throw new Error(`Respons server bukan JSON. Preview: ${rawText.substring(0, 120)}`);
+    }
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
 
     if (r === 'donatur')  renderDashboardDonatur(data);
     if (r === 'penerima') renderDashboardPenerima(data);
@@ -235,10 +247,17 @@ function showStatsError(r, msg) {
 /* ─── RENDER: DONATUR ─── */
 function renderDashboardDonatur(data) {
   const s = data.stats || {};
-  setStat('stat-d-total',    bigNum(s.total_donasi));
-  setStat('stat-d-berjalan', bigNum(s.berjalan,   'amber'));
-  setStat('stat-d-selesai',  bigNum(s.selesai,    'green'));
-  setStat('stat-d-sertif',   bigNum(s.sertifikat, 'green'));
+
+  // Stat cards: tampilkan angka nyata dari DB
+  const total = s.total_donasi ?? 0;
+  const berjalan = s.berjalan ?? 0;
+  const selesai = s.selesai ?? 0;
+  const sertif = s.sertifikat ?? 0;
+
+  setStat('stat-d-total',    `<big>${total}</big><span class="stat-sub">${total === 0 ? 'Belum ada donasi' : 'kali berdonasi'}</span>`);
+  setStat('stat-d-berjalan', `<big style="color:#d97706">${berjalan}</big><span class="stat-sub">${berjalan === 0 ? 'Semua selesai ✅' : 'sedang dikirim'}</span>`);
+  setStat('stat-d-selesai',  `<big style="color:var(--g5)">${selesai}</big><span class="stat-sub">${selesai === 0 ? 'Belum ada' : 'donasi selesai'}</span>`);
+  setStat('stat-d-sertif',   `<big style="color:var(--g5)">${sertif}</big><span class="stat-sub">${sertif === 0 ? 'Belum ada' : 'sertifikat'}</span>`);
 
   const rows = data.riwayat || [];
   if (!rows.length) {
@@ -262,10 +281,15 @@ function renderDashboardDonatur(data) {
 /* ─── RENDER: PENERIMA ─── */
 function renderDashboardPenerima(data) {
   const s = data.stats || {};
-  setStat('stat-y-total',   bigNum(s.total_donasi));
-  setStat('stat-y-aktif',   bigNum(s.kebutuhan_aktif,  'amber'));
-  setStat('stat-y-konfirm', bigNum(s.perlu_konfirmasi, 'red'));
-  setStat('stat-y-pct',     bigNum(s.pct_terpenuhi,    'green'));
+  const yTotal   = s.total_donasi      ?? 0;
+  const yAktif   = s.kebutuhan_aktif   ?? 0;
+  const yKonfirm = s.perlu_konfirmasi  ?? 0;
+  const yPct     = s.pct_terpenuhi     ?? '0%';
+
+  setStat('stat-y-total',   `<big>${yTotal}</big><span class="stat-sub">${yTotal === 0 ? 'Belum ada donasi' : 'total donasi masuk'}</span>`);
+  setStat('stat-y-aktif',   `<big style="color:#d97706">${yAktif}</big><span class="stat-sub">${yAktif === 0 ? 'Semua terpenuhi ✅' : 'kebutuhan aktif'}</span>`);
+  setStat('stat-y-konfirm', `<big style="color:#dc2626">${yKonfirm}</big><span class="stat-sub">${yKonfirm === 0 ? 'Tidak ada ✅' : 'perlu dikonfirmasi'}</span>`);
+  setStat('stat-y-pct',     `<big style="color:var(--g5)">${yPct}</big><span class="stat-sub">terpenuhi bulan ini</span>`);
 
   // Tabel perlu konfirmasi = status 'dikirim'
   const konfRows = (data.riwayat || []).filter(r => r.status === 'dikirim');
@@ -300,10 +324,15 @@ function renderDashboardPenerima(data) {
 /* ─── RENDER: ADMIN ─── */
 function renderDashboardAdmin(data) {
   const s = data.stats || {};
-  setStat('stat-a-user',   bigNum(s.total_user));
-  setStat('stat-a-aktif',  bigNum(s.donasi_aktif,   'amber'));
-  setStat('stat-a-verif',  bigNum(s.penerima_verif, 'green'));
-  setStat('stat-a-barang', bigNum(s.total_barang,   'green'));
+  const aUser   = s.total_user      ?? 0;
+  const aAktif  = s.donasi_aktif    ?? 0;
+  const aVerif  = s.penerima_verif  ?? 0;
+  const aBarang = s.total_barang    ?? 0;
+
+  setStat('stat-a-user',   `<big>${aUser}</big><span class="stat-sub">pengguna terdaftar</span>`);
+  setStat('stat-a-aktif',  `<big style="color:#d97706">${aAktif}</big><span class="stat-sub">${aAktif === 0 ? 'Tidak ada aktif' : 'donasi aktif'}</span>`);
+  setStat('stat-a-verif',  `<big style="color:var(--g5)">${aVerif}</big><span class="stat-sub">penerima terverifikasi</span>`);
+  setStat('stat-a-barang', `<big style="color:var(--g5)">${aBarang}</big><span class="stat-sub">barang tersalurkan</span>`);
 
   const pending = data.pending || [];
   setHtml('tbl-a-pending', !pending.length
@@ -449,8 +478,9 @@ function verifikasi(btn, userId, aksi) {
   });
 }
 
-/*
-   NAVIGASI INNER PAGE*/
+/* ═══════════════════════════════════════
+   NAVIGASI INNER PAGE
+   ═══════════════════════════════════════ */
 const navItems = {
   donatur : [
     { k:'d-home',  l:'🏠 Dashboard' },
@@ -494,8 +524,9 @@ function nav(k) {
 
 function doLogout() { window.location.href = 'backend/logout.php'; }
 
-/* 
-   PROFIL*/
+/* ═══════════════════════════════════════
+   PROFIL
+   ═══════════════════════════════════════ */
 function renderProfile(r) {
   const u = currentUser;
   const initials = u.nama ? u.nama.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase() : '?';
@@ -547,8 +578,9 @@ function simpanProfil() {
   toast('✅ Profil berhasil diperbarui!');
 }
 
-/* 
-   KATALOG */
+/* ═══════════════════════════════════════
+   KATALOG
+   ═══════════════════════════════════════ */
 function renderKatalog() {
   const g = document.getElementById('kat-grid');
   if (!g) return;
@@ -605,8 +637,9 @@ function piliItem(nama, org) {
   setTimeout(() => nav('d-don'), 700);
 }
 
-/* 
-   FORM DONASI & KURIR */
+/* ═══════════════════════════════════════
+   FORM DONASI & KURIR
+   ═══════════════════════════════════════ */
 function pickSlot(el) {
   document.querySelectorAll('.slot').forEach(s => s.classList.remove('on'));
   el.classList.add('on');
@@ -677,8 +710,9 @@ function submitDon() {
   }, 1500);
 }
 
-/* 
-   TRACKING RESI */
+/* ═══════════════════════════════════════
+   TRACKING RESI
+   ═══════════════════════════════════════ */
 function lacakResi(resi) {
   nav('d-lacak');
   const inp = document.getElementById('input-resi');
@@ -712,8 +746,9 @@ function showTrack(resiManual = null) {
     </div>`;
 }
 
-/* 
-   PENERIMA — konfirmasi & hapus row*/
+/* ═══════════════════════════════════════
+   PENERIMA — konfirmasi & hapus row
+   ═══════════════════════════════════════ */
 function konfirm(btn) {
   toast('📸 Kamera dibuka — foto bukti penerimaan fisik');
   btn.textContent = '✓ Dikonfirmasi';
@@ -725,8 +760,9 @@ function hapusRow(btn) {
   toast('Kebutuhan dihapus dari katalog');
 }
 
-/* 
-   TOAST */
+/* ═══════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════ */
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
@@ -736,8 +772,9 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('on'), 2800);
 }
 
-/* 
-   INIT*/
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof PHP_SESSION !== 'undefined' && PHP_SESSION && PHP_SESSION.role) {
     currentUser = {

@@ -16,11 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $row = $result->fetch_assoc();
 
         if(password_verify($password, $row['password'])) {
-            // Simpan data user ke session
-            $_SESSION['id']    = $row['id'];
-            $_SESSION['nama']  = $row['nama_lengkap'];
-            $_SESSION['email'] = $row['email'];
-            $_SESSION['role']  = $row['role'];
+            // Simpan data user ke session (termasuk no_telp dan alamat untuk profil)
+            $_SESSION['id']      = $row['id'];
+            $_SESSION['nama']    = $row['nama_lengkap'];
+            $_SESSION['email']   = $row['email'];
+            $_SESSION['role']    = $row['role'];
+            $_SESSION['no_telp'] = $row['no_telp']  ?? '';
+            $_SESSION['alamat']  = $row['alamat']   ?? '';
 
             // Cek status verifikasi untuk penerima
             if ($row['role'] === 'penerima' && isset($row['status_verifikasi']) && $row['status_verifikasi'] === 'pending') {

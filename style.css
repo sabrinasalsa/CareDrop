@@ -883,3 +883,61 @@ tr:hover td { background: #f7fdf9; }
   color: var(--g3);
   font-size: 1.05rem;
 }
+/* ── Skeleton Loading & Error States ─────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.sk-box {
+  display: inline-block;
+  width: 70px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e2f5eb 25%, #c8eedd 50%, #e2f5eb 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+/* stat card value wrapper — holds either <big> or skeleton */
+.sc span[id^="stat-"] {
+  display: block;
+  min-height: 42px;
+}
+
+.stat-err {
+  font-size: .78rem;
+  color: #dc2626;
+  line-height: 1.4;
+}
+.stat-err small { font-size: .72rem; opacity: .8; }
+
+/* table loading / error rows */
+.tbl-loading {
+  text-align: center;
+  padding: 18px 12px !important;
+  color: var(--text2);
+  font-size: .88rem;
+}
+.tbl-err {
+  text-align: center;
+  padding: 16px 12px !important;
+  color: #dc2626;
+  font-size: .85rem;
+}
+
+/* btn-red */
+.btn-red {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+}
+.btn-red:hover { background: #b02a37; }
+
+/* btn-outline */
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--g3);
+  color: var(--g3);
+}
+.btn-outline:hover { background: var(--surf); }

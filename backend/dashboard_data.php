@@ -1,37 +1,28 @@
 <?php
 /**
  * CareDrop – backend/dashboard_data.php
- * API endpoint JSON murni — HARUS tidak ada output HTML sama sekali
+ * Kolom status donasi: status_donasi (confirmed dari user)
  */
 
-// ── 1. Buffer semua output agar PHP error/warning tidak bocor ke JSON ──
 ob_start();
-
-// ── 2. Matikan display_errors untuk endpoint ini ──
 ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
 error_reporting(0);
 
 session_start();
 require_once __DIR__ . '/koneksi.php';
 
-// ── 3. Buang buffer (tangkap warning PHP dari koneksi dll) ──
 ob_end_clean();
-
-// ── 4. Set header JSON ──
 header('Content-Type: application/json; charset=utf-8');
 
-// ── 5. Guard: harus sudah login ──
 if (!isset($_SESSION['id'], $_SESSION['role'])) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized - silakan login ulang']);
+    echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
 $user_id = (int) $_SESSION['id'];
 $role    = $_SESSION['role'];
 
-// ── Helper: query satu baris ──
 function queryOne(mysqli $db, string $sql, string $types = '', ...$params): array {
     $stmt = $db->prepare($sql);
     if (!$stmt) return ['cnt' => 0, 'total' => 0];
@@ -42,7 +33,6 @@ function queryOne(mysqli $db, string $sql, string $types = '', ...$params): arra
     return $row ?: ['cnt' => 0, 'total' => 0];
 }
 
-// ── Helper: query banyak baris ──
 function queryAll(mysqli $db, string $sql, string $types = '', ...$params): array {
     $stmt = $db->prepare($sql);
     if (!$stmt) return [];
@@ -57,38 +47,35 @@ $response = [];
 
 try {
 
-    /* ════════════════════════════════════════
+    /* ════════════════════════════════════
        ROLE: DONATUR
-    ════════════════════════════════════════ */
+    ════════════════════════════════════ */
     if ($role === 'donatur') {
 
-        $total    = queryOne($koneksi,
+        $total = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt FROM donasi WHERE donatur_id = ?",
             "i", $user_id);
 
         $berjalan = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt FROM donasi
-             WHERE donatur_id = ? AND status NOT IN ('selesai','dibatalkan')",
+             WHERE donatur_id = ? AND status_donasi NOT IN ('selesai','dibatalkan')",
             "i", $user_id);
 
-        $selesai  = queryOne($koneksi,
+        $selesai = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt FROM donasi
-             WHERE donatur_id = ? AND status = 'selesai'",
+             WHERE donatur_id = ? AND status_donasi = 'selesai'",
             "i", $user_id);
 
-        $sertifikat = queryOne($koneksi,
-            "SELECT COUNT(*) AS cnt FROM donasi
-             WHERE donatur_id = ? AND status = 'selesai'",
-            "i", $user_id);
+        $sertifikat = $selesai;
 
         $riwayat = queryAll($koneksi,
             "SELECT
-                d.id            AS donasi_id,
+                d.id                                    AS donasi_id,
                 d.qty_donasi,
-                d.status,
+                d.status_donasi                         AS status,
                 d.created_at,
-                COALESCE(k.nama_barang, '(barang dihapus)') AS nama_barang,
-                COALESCE(u.nama_lengkap, '(yayasan)')       AS nama_yayasan,
+                COALESCE(k.nama_barang, '—')            AS nama_barang,
+                COALESCE(u.nama_lengkap, '—')           AS nama_yayasan,
                 p.no_resi
              FROM donasi d
              LEFT JOIN katalog_kebutuhan k ON k.id = d.katalog_id
@@ -110,9 +97,9 @@ try {
             'riwayat' => $riwayat,
         ];
 
-    /* ════════════════════════════════════════
+    /* ════════════════════════════════════
        ROLE: PENERIMA
-    ════════════════════════════════════════ */
+    ════════════════════════════════════ */
     } elseif ($role === 'penerima') {
 
         $total = queryOne($koneksi,
@@ -131,7 +118,7 @@ try {
             "SELECT COUNT(*) AS cnt
              FROM donasi d
              JOIN katalog_kebutuhan k ON k.id = d.katalog_id
-             WHERE k.yayasan_id = ? AND d.status = 'dikirim'",
+             WHERE k.yayasan_id = ? AND d.status_donasi = 'dikirim'",
             "i", $user_id);
 
         $bulan_selesai = queryOne($koneksi,
@@ -139,7 +126,7 @@ try {
              FROM donasi d
              JOIN katalog_kebutuhan k ON k.id = d.katalog_id
              WHERE k.yayasan_id = ?
-               AND d.status = 'selesai'
+               AND d.status_donasi = 'selesai'
                AND MONTH(d.created_at) = MONTH(NOW())
                AND YEAR(d.created_at)  = YEAR(NOW())",
             "i", $user_id);
@@ -159,14 +146,13 @@ try {
 
         $riwayat = queryAll($koneksi,
             "SELECT
-                d.id            AS donasi_id,
+                d.id                           AS donasi_id,
                 d.qty_donasi,
-                d.status,
+                d.status_donasi                AS status,
                 d.created_at,
                 COALESCE(k.nama_barang, '—')   AS nama_barang,
                 COALESCE(u.nama_lengkap, '—')  AS nama_donatur,
-                p.no_resi,
-                p.estimasi_ongkir
+                p.no_resi
              FROM donasi d
              JOIN katalog_kebutuhan k ON k.id = d.katalog_id
              JOIN users             u ON u.id = d.donatur_id
@@ -196,25 +182,24 @@ try {
             'katalog' => $katalog,
         ];
 
-    /* ════════════════════════════════════════
+    /* ════════════════════════════════════
        ROLE: ADMIN
-    ════════════════════════════════════════ */
+    ════════════════════════════════════ */
     } elseif ($role === 'admin') {
 
-        $total_user = queryOne($koneksi,
-            "SELECT COUNT(*) AS cnt FROM users");
+        $total_user = queryOne($koneksi, "SELECT COUNT(*) AS cnt FROM users");
 
         $donasi_aktif = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt FROM donasi
-             WHERE status NOT IN ('selesai','dibatalkan')");
+             WHERE status_donasi NOT IN ('selesai','dibatalkan')");
 
         $penerima_verif = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt FROM users
              WHERE role = 'penerima' AND status_verifikasi = 'verified'");
 
         $total_barang = queryOne($koneksi,
-            "SELECT COALESCE(SUM(qty_donasi), 0) AS total
-             FROM donasi WHERE status = 'selesai'");
+            "SELECT COALESCE(SUM(qty_donasi), 0) AS total FROM donasi
+             WHERE status_donasi = 'selesai'");
 
         $pending = queryAll($koneksi,
             "SELECT id, nama_lengkap, email,
@@ -227,7 +212,7 @@ try {
             "SELECT
                 d.id                            AS donasi_id,
                 d.qty_donasi,
-                d.status,
+                d.status_donasi                 AS status,
                 d.created_at,
                 COALESCE(k.nama_barang, '—')    AS nama_barang,
                 COALESCE(ud.nama_lengkap, '—')  AS nama_donatur,
@@ -257,12 +242,10 @@ try {
     }
 
 } catch (Throwable $e) {
-    // Tangkap semua error PHP — jangan tampilkan HTML, kembalikan JSON
     http_response_code(500);
     echo json_encode([
-        'error'   => 'Server error: ' . $e->getMessage(),
-        'file'    => basename($e->getFile()),
-        'line'    => $e->getLine(),
+        'error' => 'Server error: ' . $e->getMessage(),
+        'line'  => $e->getLine(),
     ]);
     exit;
 }

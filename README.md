@@ -18,7 +18,7 @@ USER (DONATUR)
     - Mengajukan Tawaran Donasi Barang
     - Memasukkan Nomor Resi Pengiriman
   - Melacak Status Pengiriman Barang (Timeline)
-  - Melihat Riwayat Donasi
+  - Melihat Riwayat Donasi & Unduh E-Sertifikat
 
 YAYASAN / POSKO
   - Landing Page
@@ -35,8 +35,8 @@ ADMIN
   - Login
     - Verifikasi Pendaftaran Yayasan Baru
     - Mengelola Data Kategori Barang (Master Data)
+    - Mengelola Templat E-Sertifikat (Unggah Desain)
     - Memantau Dasbor Analitik & Statistik
-
 ```
 ## Teknologi
 PHP CSS HTML JavaScript PHP MySQL Apache

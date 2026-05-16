@@ -107,6 +107,18 @@ $koneksi->close();
 
   <?php if (isset($_GET['added'])): ?>
     <div class="flash flash-ok">✅ Kebutuhan berhasil ditambahkan ke katalog!</div>
+  <?php elseif (isset($_GET['deleted'])): ?>
+    <div class="flash flash-ok">🗑 Kebutuhan berhasil dihapus dari katalog.</div>
+  <?php elseif (isset($_GET['err'])): ?>
+    <?php
+      $errMap = [
+        'ada_donasi_aktif' => '⚠️ Tidak bisa dihapus — masih ada donasi aktif untuk item ini.',
+        'notfound'         => '❌ Item tidak ditemukan atau bukan milik yayasan Anda.',
+        'invalid'          => '❌ ID tidak valid.',
+      ];
+      $errMsg = $errMap[$_GET['err']] ?? ('❌ Terjadi kesalahan: ' . htmlspecialchars($_GET['err']));
+    ?>
+    <div class="flash flash-err"><?= $errMsg ?></div>
   <?php endif; ?>
 
   <div class="top-bar">

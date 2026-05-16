@@ -1018,3 +1018,319 @@ td[colspan] {
   line-height: 1;
   display: block;
 }
+
+/* ════════════════════════════════════════
+   v5 — HAMBURGER, MOBILE NAV, NOTIF,
+        MODAL, SERTIFIKAT, AVATAR UPLOAD
+   ════════════════════════════════════════ */
+
+/* ── Hamburger button ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 7px;
+  transition: background .15s;
+}
+.hamburger:hover { background: rgba(72,201,126,.15); }
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 22px;
+  background: #86efac;
+  border-radius: 2px;
+  transition: all .25s;
+}
+
+/* ── Mobile nav overlay ── */
+.mobile-nav-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 299;
+  backdrop-filter: blur(2px);
+}
+.mobile-nav {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 260px;
+  background: #0f2419;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgba(0,0,0,.3);
+  transform: translateX(-100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.mobile-nav.open { transform: translateX(0); }
+.mobile-nav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid rgba(72,201,126,.15);
+}
+#mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+#mobile-nav-links button {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 500;
+  color: rgba(180,230,200,.8);
+  padding: 13px 20px;
+  text-align: left;
+  cursor: pointer;
+  transition: all .14s;
+  border-left: 3px solid transparent;
+}
+#mobile-nav-links button:hover,
+#mobile-nav-links button.on {
+  background: rgba(72,201,126,.1);
+  color: #4ade80;
+  border-left-color: #4ade80;
+}
+#mobile-nav-links button.on { font-weight: 700; }
+
+/* ── Notifikasi bell ── */
+.notif-bell {
+  position: relative;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  transition: background .15s;
+  user-select: none;
+}
+.notif-bell:hover { background: rgba(72,201,126,.15); }
+.notif-badge {
+  position: absolute;
+  top: 2px; right: 2px;
+  background: #dc2626;
+  color: #fff;
+  font-size: .6rem;
+  font-weight: 700;
+  min-width: 16px; height: 16px;
+  border-radius: 99px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+.notif-panel {
+  position: fixed;
+  top: 68px; right: 16px;
+  width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+  z-index: 250;
+  overflow: hidden;
+  animation: dropIn .2s ease;
+}
+.notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f0fdf4;
+  font-size: .875rem;
+}
+.notif-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f8fdf9;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.notif-item:hover { background: #f0fdf4; }
+.notif-item .notif-time {
+  font-size: .72rem;
+  color: var(--text3);
+  margin-top: 3px;
+}
+.notif-item.unread { border-left: 3px solid var(--g5); }
+@keyframes dropIn {
+  from { opacity:0; transform: translateY(-8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 400;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.hide { display: none !important; }
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  animation: modalIn .22s ease;
+}
+@keyframes modalIn {
+  from { opacity:0; transform: scale(.95) translateY(10px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #f0fdf4;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.modal-head button {
+  background: #f3f4f6;
+  border: none;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: .85rem;
+  transition: background .15s;
+}
+.modal-head button:hover { background: #e5e7eb; }
+.modal-body { padding: 20px; }
+
+/* ── Detail donasi dalam modal ── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.detail-item label {
+  display: block;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 3px;
+}
+.detail-item span {
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--text1);
+}
+
+/* ── E-Sertifikat card ── */
+.sertif-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #ecfdf5 100%);
+  border: 2px solid #16a34a;
+  border-radius: 14px;
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.sertif-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(22,163,74,.06);
+}
+.sertif-logo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #15803d;
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+}
+.sertif-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #14532d;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+.sertif-sub  { font-size: .78rem; color: #52735e; margin-bottom: 6px; }
+.sertif-nama {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #14532d;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.sertif-body {
+  font-size: .83rem;
+  color: #166534;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  max-width: 320px;
+  margin-inline: auto;
+}
+.sertif-footer {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 14px;
+  border-top: 1px solid #bbf7d0;
+  font-size: .78rem;
+}
+
+/* ── Avatar upload di profil ── */
+.avatar-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.avatar-upload-btn {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 26px; height: 26px;
+  background: var(--g5);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: .75rem;
+  transition: background .15s;
+}
+.avatar-upload-btn:hover { background: var(--g6); }
+
+/* ── Empty state dengan CTA ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+}
+.empty-state .es-icon { font-size: 3rem; margin-bottom: 14px; }
+.empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+.empty-state p  { color: var(--text2); font-size: .875rem; margin-bottom: 20px; }
+
+/* ── user-pill hide text on medium ── */
+.user-pill-txt { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .hamburger   { display: flex; }
+  #app-nav     { display: none; }
+  .user-pill-txt { display: none; }
+  .uav         { width: 34px; height: 34px; font-size: .85rem; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .notif-panel { right: 8px; left: 8px; width: auto; }
+  .modal-box   { border-radius: 12px; }
+  .sertif-card { padding: 20px 14px; }
+  .sertif-nama { font-size: 1.1rem; }
+}

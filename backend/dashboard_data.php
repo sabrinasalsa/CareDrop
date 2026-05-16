@@ -121,6 +121,13 @@ try {
              WHERE k.yayasan_id = ? AND d.status_donasi = 'dikirim'",
             "i", $user_id);
 
+        $tawaran_masuk = queryOne($koneksi,
+            "SELECT COUNT(*) AS cnt
+             FROM donasi d
+             JOIN katalog_kebutuhan k ON k.id = d.katalog_id
+             WHERE k.yayasan_id = ? AND d.status_donasi = 'menunggu'",
+            "i", $user_id);
+
         $bulan_selesai = queryOne($koneksi,
             "SELECT COUNT(*) AS cnt
              FROM donasi d
@@ -149,6 +156,7 @@ try {
                 d.id                           AS donasi_id,
                 d.qty_donasi,
                 d.status_donasi                AS status,
+                COALESCE(d.alasan_tolak,'')    AS alasan_tolak,
                 d.created_at,
                 COALESCE(k.nama_barang, '—')   AS nama_barang,
                 COALESCE(u.nama_lengkap, '—')  AS nama_donatur,

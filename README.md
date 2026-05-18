@@ -81,7 +81,7 @@ CareDrop
 | Apache | Menjalankan web server localhost |
 | XAMPP | Local development environment |
 
-# 🗄 DBMS Configuration
+# DBMS Configuration
 
 ## DBMS
 ```text
@@ -90,7 +90,7 @@ MySQL
 
 ## Database Name
 ```text
-caredrop_db
+caredrop
 ```
 
 ## Server Configuration
@@ -98,9 +98,7 @@ caredrop_db
 | Configuration | Value |
 |---|---|
 | Host | localhost |
-| Port | 3306 |
 | Username | root |
-| Password | (default XAMPP / kosong) |
 | Server | Apache (XAMPP) |
 
 ---

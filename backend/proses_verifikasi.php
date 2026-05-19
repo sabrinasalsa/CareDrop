@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/proses_verifikasi.php
- * AJAX endpoint untuk Admin: setujui / tolak akun Penerima
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

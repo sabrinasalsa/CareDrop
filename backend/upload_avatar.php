@@ -20,7 +20,8 @@ if ($file['size'] > 2*1024*1024) {
     echo json_encode(['ok'=>false,'error'=>'Ukuran maksimal 2MB']); exit;
 }
 
-$dir = dirname(__DIR__) . '/uploads/avatar/';
+// Gunakan folder 'uploads/avatars/' (konsisten dengan dashboard.php)
+$dir = dirname(__DIR__) . '/uploads/avatars/';
 if (!is_dir($dir)) mkdir($dir, 0755, true);
 
 // Hapus avatar lama
@@ -40,4 +41,8 @@ $stmt = $koneksi->prepare("UPDATE users SET avatar=? WHERE id=?");
 $stmt->bind_param("si",$fname,$user_id); $stmt->execute(); $stmt->close();
 $koneksi->close();
 
-echo json_encode(['ok'=>true,'url'=>'uploads/avatar/'.$fname]);
+// Update session agar foto langsung berubah tanpa login ulang
+$_SESSION['avatar'] = $fname;
+
+echo json_encode(['ok'=>true,'url'=>'uploads/avatars/'.$fname]);
+

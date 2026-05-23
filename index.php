@@ -1,3 +1,18 @@
+<?php
+session_start();
+
+if (isset($_SESSION['id'], $_SESSION['role'])) {
+    switch ($_SESSION['role']) {
+        case 'admin':
+            header('Location: admin/index.php'); exit;
+        case 'penerima':
+            header('Location: yayasan/kelola_katalog.php'); exit;
+        case 'donatur':
+        default:
+            header('Location: dashboard.php'); exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -5,16 +20,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CareDrop – Donasi Barang untuk yang Membutuhkan</title>
   
-  <!-- Fonts & Libraries -->
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="Assets/css/style.css">
 </head>
 <body>
 
-<!-- ─── NAVBAR ─── -->
 <nav class="navbar" id="navbar">
   <a href="#" class="nav-logo">🌿 Care<span>Drop</span></a>
   <div class="nav-links">
@@ -24,12 +36,11 @@
     <a href="#faq">FAQ</a>
   </div>
   <div class="nav-actions">
-    <a href="index.php" class="btn-nav-outline">Masuk</a>
-    <a href="index.php?tab=register" class="btn-nav-solid">Daftar Gratis</a>
+    <a href="login.php" class="btn-nav-outline">Masuk</a>
+    <a href="login.php?tab=register" class="btn-nav-solid">Daftar Gratis</a>
   </div>
 </nav>
 
-<!-- ─── HERO ─── -->
 <section class="hero">
   <div class="hero-orb orb1"></div>
   <div class="hero-orb orb2"></div>
@@ -51,8 +62,8 @@
   </p>
 
   <div class="hero-actions" data-aos="fade-up" data-aos-duration="700" data-aos-delay="300">
-    <a href="index.php?tab=register&role=donatur" class="btn-hero-primary">
-      Mulai Donasi Sekarang →
+    <a href="login.php?tab=register&role=donatur" class="btn-hero-primary">
+      Ayo Mulai Berdonasi →
     </a>
     <a href="#cara-kerja" class="btn-hero-ghost">Lihat Cara Kerja</a>
   </div>
@@ -83,7 +94,6 @@
   </div>
 </section>
 
-<!-- ─── TRUST BAR ─── -->
 <div class="trust-bar" data-aos="fade-up" data-aos-duration="500">
   <div class="trust-inner">
     <div class="trust-item"><span>✅</span> Yayasan Terverifikasi</div>
@@ -94,7 +104,6 @@
   </div>
 </div>
 
-<!-- ─── TENTANG ─── -->
 <section class="section" id="tentang">
   <div class="container">
     <div style="max-width:580px; margin-bottom:52px;">
@@ -132,14 +141,13 @@
   </div>
 </section>
 
-<!-- wave up -->
 <div class="wave-divider" style="background:#f0f9f3;">
   <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="fill:#f4fbf6">
     <path d="M0,30 C360,60 1080,0 1440,30 L1440,0 L0,0 Z"/>
   </svg>
 </div>
 
-<!-- ─── CARA KERJA ─── -->
+
 <section class="section bg-light" id="cara-kerja">
   <div class="container" style="text-align:center;">
     <span class="section-label" data-aos="fade-up">Cara Kerja</span>
@@ -176,14 +184,13 @@
   </div>
 </section>
 
-<!-- wave down -->
+
 <div class="wave-divider" style="background:#f0f9f3;">
   <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="fill:#0c2e18">
     <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z"/>
   </svg>
 </div>
 
-<!-- ─── STATISTIK ─── -->
 <section class="section bg-dark" id="dampak">
   <div class="container" style="text-align:center;">
     <span class="section-label light" data-aos="fade-up">Dampak Nyata</span>
@@ -215,7 +222,6 @@
   </div>
 </section>
 
-<!-- ─── TESTIMONIAL ─── -->
 <section class="section" id="testimoni">
   <div class="container">
     <span class="section-label" data-aos="fade-up">Cerita Nyata</span>
@@ -261,7 +267,6 @@
   </div>
 </section>
 
-<!-- ─── UNTUK SIAPA ─── -->
 <section class="section bg-light" id="bergabung" style="padding-bottom:80px;">
   <div class="container">
     <div style="text-align:center; margin-bottom:52px;">
@@ -276,7 +281,7 @@
         <div class="role-icon donatur">🤝</div>
         <h3>Donatur</h3>
         <p>Individu atau organisasi yang ingin menyalurkan barang layak pakai kepada yang membutuhkan secara langsung dan terverifikasi.</p>
-        <a href="index.php?tab=register&role=donatur" class="btn-role">Daftar sebagai Donatur →</a>
+        <a href="login.php?tab=register&role=donatur" class="btn-role">Daftar sebagai Donatur →</a>
       </div>
 
       <div class="role-card featured" data-aos="fade-left" data-aos-duration="700">
@@ -284,13 +289,12 @@
         <div class="role-icon yayasan">🏠</div>
         <h3>Yayasan / Panti</h3>
         <p>Lembaga sosial terverifikasi yang dapat mengajukan kebutuhan barang spesifik untuk penerima manfaat secara mudah dan terpercaya.</p>
-        <a href="index.php?tab=register&role=penerima" class="btn-role green">Daftar sebagai Yayasan →</a>
+        <a href="login.php?tab=register&role=penerima" class="btn-role green">Daftar sebagai Yayasan →</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ─── FAQ ─── -->
 <section class="section" id="faq">
   <div class="container">
     <div style="text-align:center; margin-bottom:52px;">
@@ -348,21 +352,19 @@
   </div>
 </section>
 
-<!-- ─── CTA ─── -->
 <section class="cta-section">
   <div class="container">
     <div class="cta-box" data-aos="zoom-in" data-aos-duration="700">
       <h2>Siap Membuat Perbedaan?</h2>
       <p>Bergabunglah bersama ribuan donatur yang sudah menyentuh kehidupan banyak orang lewat CareDrop. Mulai perjalananmu hari ini — gratis.</p>
       <div class="cta-actions">
-        <a href="index.php?tab=register" class="btn-cta-white">🎁 Mulai Berdonasi →</a>
-        <a href="index.php" class="btn-cta-outline">Sudah punya akun? Masuk</a>
+        <a href="login.php?tab=register" class="btn-cta-white">🎁 Ayo Donasi Sekarang →</a>
+        <a href="login.php" class="btn-cta-outline">Sudah punya akun? Masuk</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ─── FOOTER ─── -->
 <footer class="footer">
   <div class="container">
     <div class="footer-top">
@@ -379,9 +381,8 @@
       </div>
       <div class="footer-col">
         <h4>Akun</h4>
-        <a href="index.php">Masuk</a>
-        <a href="index.php?tab=register">Daftar Donatur</a>
-        <a href="index.php?tab=register&role=penerima">Daftar Yayasan</a>
+        <a href="login.php">Masuk</a>
+        <a href="login.php?tab=register">Daftar Gratis</a>
       </div>
     </div>
     <div class="footer-bottom">

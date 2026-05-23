@@ -1,8 +1,4 @@
 <?php
-/**
- * CareDrop – backend/proses_donasi.php
- * Simpan donasi ke DB dengan kolom status_donasi
- */
 ob_start();
 ini_set('display_errors', 0);
 error_reporting(0);
@@ -14,30 +10,52 @@ header('Content-Type: application/json; charset=utf-8');
 if (!isset($_SESSION['id'])) {
     echo json_encode(['ok' => false, 'error' => 'Belum login']); exit;
 }
+if ($_SESSION['role'] !== 'donatur') {
+    echo json_encode(['ok' => false, 'error' => 'Hanya donatur yang dapat mengajukan tawaran']); exit;
+}
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['ok' => false, 'error' => 'Method tidak valid']); exit;
 }
 
-$donatur_id  = (int) $_SESSION['id'];
-$katalog_id  = (int) ($_POST['katalog_id']  ?? 0);
-$qty         = (int) ($_POST['qty']          ?? 0);
-$deskripsi   = htmlspecialchars(trim($_POST['deskripsi']   ?? ''));
-$kurir       = htmlspecialchars(trim($_POST['kurir']        ?? ''));
-$kota_asal   = htmlspecialchars(trim($_POST['kota_asal']   ?? ''));
-$kota_tujuan = htmlspecialchars(trim($_POST['kota_tujuan'] ?? ''));
-$berat       = max(1, (float)($_POST['berat'] ?? 1));
+$donatur_id = (int) $_SESSION['id'];
 
-if ($katalog_id <= 0 || $qty <= 0 || empty($kurir)) {
-    echo json_encode(['ok' => false, 'error' => 'Data tidak lengkap']); exit;
+// Validasi: user ID harus benar-benar ada di database
+$_vUser = $koneksi->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
+$_vUser->bind_param("i", $donatur_id);
+$_vUser->execute();
+$_uRow = $_vUser->get_result()->fetch_assoc();
+$_vUser->close();
+if (!$_uRow) {
+    echo json_encode(['ok' => false, 'error' => 'Sesi tidak valid. Silakan logout lalu login kembali.']); exit;
+}
+$katalog_id  = (int) ($_POST['katalog_id'] ?? 0);
+$qty         = (int) ($_POST['qty']        ?? 0);
+$deskripsi   = htmlspecialchars(trim($_POST['deskripsi'] ?? ''));
+
+if ($katalog_id <= 0 || $qty < 1) {
+    echo json_encode(['ok' => false, 'error' => 'Data tidak lengkap: katalog dan jumlah wajib diisi']); exit;
 }
 
 try {
-    // Buat ID unik
-    $id_donasi = 'CDR-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
-    $no_resi   = 'CD' . strtoupper(substr($kurir, 0, 3)) . rand(1000, 9999) . 'ID';
-    $status    = 'menunggu';
+    // Verifikasi katalog masih aktif dan belum terpenuhi
+    $cek = $koneksi->prepare(
+        "SELECT id, nama_barang, target_butuh, jumlah_terkumpul
+         FROM katalog_kebutuhan
+         WHERE id = ? AND (aktif = 1 OR status_aktif = 1) AND jumlah_terkumpul < target_butuh"
+    );
+    $cek->bind_param("i", $katalog_id);
+    $cek->execute();
+    $katalog = $cek->get_result()->fetch_assoc();
+    $cek->close();
 
-    // Upload foto jika ada
+    if (!$katalog) {
+        echo json_encode(['ok' => false, 'error' => 'Katalog tidak ditemukan atau kebutuhan sudah terpenuhi']); exit;
+    }
+
+    // Buat ID unik donasi
+    $id_donasi = 'CDR-' . date('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+
+    // Upload foto barang jika ada
     $foto = null;
     if (!empty($_FILES['foto_barang']['tmp_name']) && $_FILES['foto_barang']['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($_FILES['foto_barang']['name'], PATHINFO_EXTENSION));
@@ -49,29 +67,22 @@ try {
         }
     }
 
-    // Insert donasi — pakai kolom status_donasi
+    // Insert donasi — status menunggu, belum ada info pengiriman
     $stmt = $koneksi->prepare(
         "INSERT INTO donasi (id, donatur_id, katalog_id, qty_donasi, deskripsi_kondisi, foto_barang, status_donasi)
-         VALUES (?, ?, ?, ?, ?, ?, ?)"
+         VALUES (?, ?, ?, ?, ?, ?, 'menunggu')"
     );
-    $stmt->bind_param("siiiiss", $id_donasi, $donatur_id, $katalog_id, $qty, $deskripsi, $foto, $status);
+    $stmt->bind_param("siiiss", $id_donasi, $donatur_id, $katalog_id, $qty, $deskripsi, $foto);
     $stmt->execute();
     $stmt->close();
 
-    // Insert pengiriman
-    $tipe_layanan    = in_array($kurir, ['gosend','grab']) ? 'instant' : 'reguler';
-    $estimasi_ongkir = round(15000 * $berat);
-
-    $stmt2 = $koneksi->prepare(
-        "INSERT INTO pengiriman (donasi_id, kurir, tipe_layanan, kota_asal, kota_tujuan, berat_kg, estimasi_ongkir, no_resi)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-    );
-    $stmt2->bind_param("sssssids", $id_donasi, $kurir, $tipe_layanan, $kota_asal, $kota_tujuan, $berat, $estimasi_ongkir, $no_resi);
-    $stmt2->execute();
-    $stmt2->close();
-
     $koneksi->close();
-    echo json_encode(['ok' => true, 'resi' => $no_resi, 'id' => $id_donasi]);
+    echo json_encode([
+        'ok'      => true,
+        'id'      => $id_donasi,
+        'barang'  => $katalog['nama_barang'],
+        'message' => 'Tawaran donasi berhasil diajukan! Silakan tunggu persetujuan dari yayasan.'
+    ]);
 
 } catch (Throwable $e) {
     echo json_encode(['ok' => false, 'error' => 'Server error: ' . $e->getMessage()]);

@@ -2,7 +2,7 @@
 require_once __DIR__ . '/koneksi.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../login.php');
     exit;
 }
 
@@ -14,12 +14,12 @@ $role     = $_POST['role'] ?? '';
 $password = $_POST['password'] ?? '';
 
 if (empty($nama) || empty($email) || empty($password) || empty($no_telp) || empty($role)) {
-    echo "<script>alert('ERROR: ISI SEMUA DATA TERLEBIH DAHULU!'); window.location.href='../index.php';</script>";
+    echo "<script>alert('ERROR: ISI SEMUA DATA TERLEBIH DAHULU!'); window.location.href='../login.php?tab=register';</script>";
     exit;
 }
 
 if (strlen($password) < 6) {
-    echo "<script>alert('Sandi minimal 6 karakter!'); window.location.href='../index.php';</script>";
+    echo "<script>alert('Sandi minimal 6 karakter!'); window.location.href='../login.php?tab=register';</script>";
     exit;
 }
 
@@ -34,16 +34,18 @@ $stmt->bind_param("sssssss", $nama, $email, $hashed, $no_telp, $alamat, $role, $
 
 try {
     if ($stmt->execute()) {
-        $msg = ($role === 'penerima')
-            ? 'Registrasi Berhasil! Akun Penerima Anda sedang menunggu verifikasi Admin.'
-            : 'Registrasi CareDrop Berhasil! Selamat datang, ' . $nama;
-        echo "<script>alert('" . addslashes($msg) . "'); window.location.href='../index.php';</script>";
+        if ($role === 'penerima') {
+            echo "<script>alert('Registrasi Berhasil! Akun Penerima Anda sedang menunggu verifikasi Admin.'); window.location.href='../login.php?flash=registered';</script>";
+        } else {
+            header('Location: ../login.php?flash=registered');
+            exit;
+        }
     }
 } catch (mysqli_sql_exception $e) {
     if ($e->getCode() == 1062) {
-        echo "<script>alert('ERROR: EMAIL SUDAH TERDAFTAR!'); window.location.href='../index.php';</script>";
+        echo "<script>alert('ERROR: EMAIL SUDAH TERDAFTAR!'); window.location.href='../login.php?tab=register';</script>";
     } else {
-        echo "<script>alert('Terjadi kesalahan: " . addslashes($e->getMessage()) . "'); window.location.href='../index.php';</script>";
+        echo "<script>alert('Terjadi kesalahan: " . addslashes($e->getMessage()) . "'); window.location.href='../login.php?tab=register';</script>";
     }
 }
 

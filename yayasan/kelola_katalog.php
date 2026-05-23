@@ -1,181 +1,650 @@
 <?php
 session_start();
 require_once dirname(__DIR__) . '/backend/koneksi.php';
-
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penerima') {
-    header('Location: ../index.php');
-    exit;
+    header('Location: ../index.php'); exit;
+}
+$yayasan_id = (int)$_SESSION['id'];
+$nama_yayasan = htmlspecialchars($_SESSION['nama'] ?? 'Yayasan');
+
+$total_item = $item_aktif = $item_tutup = $total_donasi = 0;
+$badge_menunggu = $badge_dikirim = 0;
+$katalog_list = [];
+
+try {
+    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=?");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $total_item = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+
+    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=? AND aktif=1");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $item_aktif = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+
+    $item_tutup = $total_item - $item_aktif;
+
+    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+        JOIN katalog_kebutuhan k ON d.katalog_id = k.id
+        WHERE k.yayasan_id = ? AND d.status_donasi NOT IN ('dibatalkan','ditolak')");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $total_donasi = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+
+    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+        JOIN katalog_kebutuhan k ON d.katalog_id = k.id
+        WHERE k.yayasan_id = ? AND d.status_donasi = 'menunggu'");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $badge_menunggu = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+
+    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+        JOIN katalog_kebutuhan k ON d.katalog_id = k.id
+        WHERE k.yayasan_id = ? AND d.status_donasi = 'dikirim'");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $badge_dikirim = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+
+    $r = $koneksi->prepare("SELECT k.*,
+           (SELECT COUNT(*) FROM donasi d WHERE d.katalog_id = k.id
+            AND d.status_donasi NOT IN ('dibatalkan','ditolak')) as total_donasi_item
+        FROM katalog_kebutuhan k
+        WHERE k.yayasan_id = ?
+        ORDER BY k.created_at DESC");
+    $r->bind_param("i", $yayasan_id); $r->execute();
+    $katalog_list = $r->get_result()->fetch_all(MYSQLI_ASSOC); $r->close();
+
+} catch (Exception $e) {
+
 }
 
-$yayasan_id = (int) $_SESSION['id'];
 
-// Ambil data katalog
-$stmt = $koneksi->prepare(
-    "SELECT * FROM katalog_kebutuhan WHERE yayasan_id = ? ORDER BY
-     FIELD(urgensi,'high','med','low'), id DESC"
-);
-$stmt->bind_param("i", $yayasan_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$items  = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
-$koneksi->close();
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kelola Katalog – CareDrop</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --g1:#f0fdf4; --g2:#dcfce7; --g5:#16a34a; --g6:#15803d;
-      --dark:#0f2419; --text1:#1a2e22; --text2:#52735e; --text3:#94a39b;
-      --radius:12px; --shadow:0 2px 12px rgba(0,0,0,.08);
-    }
-    body { font-family:'Plus Jakarta Sans',sans-serif; background:#f8fdf9; color:var(--text1); min-height:100vh; }
-    header {
-      background:var(--dark); color:#fff; padding:14px 32px;
-      display:flex; align-items:center; justify-content:space-between;
-      position:sticky; top:0; z-index:99;
-    }
-    header .logo { font-size:1.25rem; font-weight:700; color:#4ade80; }
-    header nav a {
-      color:#cbd5e1; text-decoration:none; font-size:.875rem; margin-left:20px;
-      transition:color .2s;
-    }
-    header nav a:hover { color:#fff; }
-    .container { max-width:900px; margin:0 auto; padding:32px 20px; }
-    h1 { font-size:1.5rem; font-weight:700; margin-bottom:4px; }
-    .sub { color:var(--text2); font-size:.875rem; margin-bottom:24px; }
-    .top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-    .btn {
-      display:inline-flex; align-items:center; gap:6px;
-      padding:10px 18px; border-radius:8px; font-size:.875rem; font-weight:600;
-      cursor:pointer; border:none; text-decoration:none; transition:all .2s;
-    }
-    .btn-green  { background:var(--g5); color:#fff; }
-    .btn-green:hover { background:var(--g6); }
-    .btn-danger { background:#fee2e2; color:#dc2626; }
-    .btn-danger:hover { background:#fecaca; }
-    .btn-sm { padding:7px 12px; font-size:.78rem; }
-    table { width:100%; border-collapse:collapse; background:#fff; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
-    thead th {
-      background:var(--dark); color:#fff; text-align:left;
-      padding:14px 16px; font-size:.78rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
-    }
-    tbody tr { border-bottom:1px solid #f0fdf4; transition:background .15s; }
-    tbody tr:hover { background:#f8fdf9; }
-    tbody tr:last-child { border-bottom:none; }
-    td { padding:14px 16px; font-size:.875rem; vertical-align:middle; }
-    .tag {
-      display:inline-block; padding:3px 10px; border-radius:20px;
-      font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
-    }
-    .tag-high { background:#fee2e2; color:#dc2626; }
-    .tag-med  { background:#fef3c7; color:#92400e; }
-    .tag-low  { background:#dcfce7; color:#15803d; }
-    .prog-wrap { display:flex; align-items:center; gap:8px; min-width:120px; }
-    .prog { flex:1; height:6px; background:#e8f5ea; border-radius:99px; overflow:hidden; }
-    .pf   { height:100%; background:var(--g5); border-radius:99px; transition:width .4s; }
-    .prog-txt { font-size:.78rem; color:var(--text2); white-space:nowrap; }
-    .empty { text-align:center; padding:48px 20px; color:var(--text3); }
-    .empty span { font-size:2.5rem; display:block; margin-bottom:12px; }
-    .flash {
-      padding:12px 16px; border-radius:8px; margin-bottom:20px;
-      font-size:.875rem; font-weight:500;
-    }
-    .flash-ok  { background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
-    .flash-err { background:#fee2e2; color:#dc2626; border:1px solid #fecaca; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Kebutuhan — CareDrop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --forest: #0c2e18;
+            --pine: #1e5630;
+            --moss: #2d7a44;
+            --sage: #4aad6b;
+            --mint: #7ed9a3;
+            --amber: #f0c040;
+            --ink: #0b1f12;
+            --muted: #5c7d65;
+            --bg: #f4fbf6;
+            --border: #d4e8db;
+            --white: #ffffff;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --red-border: #fecaca;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 240px; min-height: 100vh; background: var(--forest);
+            position: fixed; top: 0; left: 0; z-index: 100;
+            display: flex; flex-direction: column; padding: 0;
+        }
+        .sidebar-brand {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-brand .brand-name {
+            font-size: 20px; font-weight: 800; color: var(--mint);
+            letter-spacing: -0.5px;
+        }
+        .sidebar-brand .brand-role {
+            font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .sidebar-nav { flex: 1; padding: 16px 12px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 10px;
+            color: rgba(255,255,255,0.65); text-decoration: none;
+            font-size: 14px; font-weight: 500;
+            transition: all 0.18s ease; margin-bottom: 2px;
+            position: relative;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .nav-item.active { background: rgba(126,217,163,0.15); color: var(--mint); }
+        .nav-item .badge {
+            margin-left: auto; background: var(--amber); color: var(--ink);
+            font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px;
+        }
+        .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0; }
+        .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+
+        /* MAIN */
+        .main { margin-left: 240px; flex: 1; min-height: 100vh; padding: 32px 36px; }
+        .page-header { margin-bottom: 28px; }
+        .page-title { font-size: 26px; font-weight: 800; color: var(--forest); letter-spacing: -0.5px; }
+        .page-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+        /* STATS */
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 22px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .stat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--moss), var(--sage));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; flex-shrink: 0;
+        }
+        .stat-icon.amber { background: linear-gradient(135deg, #d97706, var(--amber)); }
+        .stat-icon.pine { background: linear-gradient(135deg, var(--pine), var(--moss)); }
+        .stat-icon.muted { background: linear-gradient(135deg, var(--muted), #7a9e85); }
+        .stat-value { font-size: 26px; font-weight: 800; color: var(--forest); line-height: 1; }
+        .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+        /* TOOLBAR */
+        .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, var(--moss), var(--sage));
+            color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
+            font-family: inherit; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: opacity 0.18s; text-decoration: none;
+        }
+        .btn-primary:hover { opacity: 0.88; }
+        .search-box {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 14px;
+        }
+        .search-box input {
+            border: none; outline: none; font-family: inherit; font-size: 14px;
+            color: var(--ink); background: transparent; width: 220px;
+        }
+        .search-box svg { color: var(--muted); flex-shrink: 0; }
+
+        /* TABLE */
+        .table-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden;
+            box-shadow: 0 1px 4px rgba(12,46,24,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { border-bottom: 1px solid var(--border); }
+        thead th {
+            padding: 13px 16px; text-align: left;
+            font-size: 12px; font-weight: 700; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.5px;
+            background: #f9fdf9;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f9fdf9; }
+        tbody td { padding: 14px 16px; font-size: 14px; color: var(--ink); vertical-align: middle; }
+
+        /* BADGES */
+        .badge-urgensi {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+        .urgensi-high { background: #fef2f2; color: #dc2626; }
+        .urgensi-med { background: #fffbeb; color: #d97706; }
+        .urgensi-low { background: #f0fdf4; color: #16a34a; }
+        .badge-status {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .status-aktif { background: #f0fdf4; color: #16a34a; }
+        .status-tutup { background: #f3f4f6; color: #6b7280; }
+        .badge-kat {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 600; background: #eff6ff; color: #3b82f6;
+        }
+
+        /* PROGRESS */
+        .progress-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .progress-label { font-size: 12px; color: var(--muted); }
+        .progress-bar-bg { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+        .progress-bar-fill { background: linear-gradient(90deg, var(--moss), var(--sage)); height: 100%; border-radius: 99px; transition: width 0.3s; }
+
+        /* AKSI BUTTONS */
+        .btn-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--white); cursor: pointer; color: var(--muted);
+            transition: all 0.15s; text-decoration: none;
+        }
+        .btn-icon:hover { border-color: var(--sage); color: var(--moss); background: #f0fdf4; }
+        .btn-icon.danger:hover { border-color: #fca5a5; color: var(--red); background: var(--red-light); }
+        .btn-icon.warning:hover { border-color: #fcd34d; color: #d97706; background: #fffbeb; }
+        .aksi-group { display: flex; gap: 6px; align-items: center; }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(11,31,18,0.45); backdrop-filter: blur(2px);
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--white); border-radius: 18px; padding: 32px;
+            width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .modal-title { font-size: 18px; font-weight: 800; color: var(--forest); }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--muted); transition: all 0.15s;
+        }
+        .modal-close:hover { background: var(--red-light); color: var(--red); border-color: var(--red-border); }
+
+        /* FORM */
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--forest); margin-bottom: 7px; }
+        .form-control {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+            border-radius: 10px; font-family: inherit; font-size: 14px; color: var(--ink);
+            background: var(--white); transition: border-color 0.15s; outline: none;
+        }
+        .form-control:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74,173,107,0.12); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+        .btn-ghost {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border);
+            background: none; font-family: inherit; font-size: 14px; font-weight: 600;
+            color: var(--muted); cursor: pointer; transition: all 0.15s;
+        }
+        .btn-ghost:hover { background: var(--bg); border-color: var(--sage); color: var(--moss); }
+
+        /* TOAST */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 18px; min-width: 280px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            animation: slideIn 0.25s ease;
+        }
+        .toast.success { border-left: 4px solid var(--sage); }
+        .toast.error { border-left: 4px solid var(--red); }
+        .toast-icon { flex-shrink: 0; }
+        .toast.success .toast-icon { color: var(--moss); }
+        .toast.error .toast-icon { color: var(--red); }
+        .toast-msg { font-size: 14px; font-weight: 500; color: var(--ink); }
+        @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+        .empty-state svg { margin: 0 auto 12px; display: block; opacity: 0.35; }
+        .empty-state p { font-size: 15px; }
+
+        @media (max-width: 900px) {
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .main { padding: 20px 16px; }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <span class="logo">🌿 CareDrop</span>
-  <nav>
-    <a href="../index.php">← Kembali ke Dashboard</a>
-    <a href="../backend/logout.php">Keluar</a>
-  </nav>
-</header>
 
-<div class="container">
-  <h1>📋 Kelola Katalog Kebutuhan</h1>
-  <p class="sub">Yayasan: <strong><?= htmlspecialchars($_SESSION['nama']) ?></strong></p>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-name">CareDrop</div>
+        <div class="brand-role">Portal Yayasan</div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="kelola_katalog.php" class="nav-item active">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+            Dashboard
+        </a>
+        <a href="kelola_katalog.php" class="nav-item active">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            Katalog Kebutuhan
+        </a>
+        <a href="tawaran_masuk.php" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+            Tawaran Masuk
+            <?php if ($badge_menunggu > 0): ?>
+                <span class="badge"><?= $badge_menunggu ?></span>
+            <?php endif; ?>
+        </a>
+        <a href="konfirmasi_terima.php" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Konfirmasi Terima
+            <?php if ($badge_dikirim > 0): ?>
+                <span class="badge"><?= $badge_dikirim ?></span>
+            <?php endif; ?>
+        </a>
+        <div class="nav-divider"></div>
+        <a href="../backend/export_csv.php" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Laporan CSV
+        </a>
+        <a href="profil_yayasan.php" class="nav-item">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            Profil &amp; Legalitas
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="../backend/logout.php" class="nav-item" style="color:rgba(255,255,255,0.5);">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+            Keluar
+        </a>
+    </div>
+</aside>
 
-  <?php if (isset($_GET['added'])): ?>
-    <div class="flash flash-ok">✅ Kebutuhan berhasil ditambahkan ke katalog!</div>
-  <?php elseif (isset($_GET['deleted'])): ?>
-    <div class="flash flash-ok">🗑 Kebutuhan berhasil dihapus dari katalog.</div>
-  <?php elseif (isset($_GET['err'])): ?>
-    <?php
-      $errMap = [
-        'ada_donasi_aktif' => '⚠️ Tidak bisa dihapus — masih ada donasi aktif untuk item ini.',
-        'notfound'         => '❌ Item tidak ditemukan atau bukan milik yayasan Anda.',
-        'invalid'          => '❌ ID tidak valid.',
-      ];
-      $errMsg = $errMap[$_GET['err']] ?? ('❌ Terjadi kesalahan: ' . htmlspecialchars($_GET['err']));
-    ?>
-    <div class="flash flash-err"><?= $errMsg ?></div>
-  <?php endif; ?>
+<!-- MAIN CONTENT -->
+<main class="main">
+    <div class="page-header">
+        <h1 class="page-title">Katalog Kebutuhan</h1>
+        <p class="page-subtitle">Selamat datang, <?= $nama_yayasan ?> — kelola daftar kebutuhan barang donasi Anda.</p>
+    </div>
 
-  <div class="top-bar">
-    <span style="color:var(--text2);font-size:.875rem"><?= count($items) ?> item kebutuhan</span>
-    <a href="tambah_kebutuhan.php" class="btn btn-green">+ Tambah Kebutuhan</a>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Barang</th>
-        <th>Kategori</th>
-        <th>Urgensi</th>
-        <th>Progress</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if (empty($items)): ?>
-        <tr>
-          <td colspan="5">
-            <div class="empty">
-              <span>📦</span>
-              Belum ada kebutuhan yang diposting.<br>
-              <a href="tambah_kebutuhan.php" class="btn btn-green btn-sm" style="margin-top:16px;display:inline-flex">+ Tambah Sekarang</a>
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
             </div>
-          </td>
-        </tr>
-      <?php else: foreach ($items as $row):
-          $pct = $row['target_butuh'] > 0
-            ? min(100, round(($row['jumlah_terkumpul'] / $row['target_butuh']) * 100))
-            : 0;
-          $urgClass = ['high'=>'tag-high','med'=>'tag-med','low'=>'tag-low'][$row['urgensi']] ?? 'tag-low';
-          $urgLabel = ['high'=>'Urgen','med'=>'Sedang','low'=>'Terpenuhi'][$row['urgensi']] ?? $row['urgensi'];
-          $katIco   = ['pakaian'=>'👕','buku'=>'📚','elektronik'=>'💻','perabot'=>'🛏️'][$row['kategori']] ?? '📦';
-      ?>
-        <tr>
-          <td><strong><?= htmlspecialchars($row['nama_barang']) ?></strong></td>
-          <td><?= $katIco ?> <?= ucfirst(htmlspecialchars($row['kategori'])) ?></td>
-          <td><span class="tag <?= $urgClass ?>"><?= $urgLabel ?></span></td>
-          <td>
-            <div class="prog-wrap">
-              <div class="prog"><div class="pf" style="width:<?= $pct ?>%"></div></div>
-              <span class="prog-txt"><?= $row['jumlah_terkumpul'] ?>/<?= $row['target_butuh'] ?></span>
+            <div>
+                <div class="stat-value"><?= $total_item ?></div>
+                <div class="stat-label">Total Item</div>
             </div>
-          </td>
-          <td>
-            <a href="hapus_kebutuhan.php?id=<?= $row['id'] ?>"
-               class="btn btn-danger btn-sm"
-               onclick="return confirm('Hapus kebutuhan &quot;<?= htmlspecialchars(addslashes($row['nama_barang'])) ?>&quot; dari katalog?')">
-              🗑 Hapus
-            </a>
-          </td>
-        </tr>
-      <?php endforeach; endif; ?>
-    </tbody>
-  </table>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pine">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <div class="stat-value"><?= $item_aktif ?></div>
+                <div class="stat-label">Item Aktif</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon muted">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <div class="stat-value"><?= $item_tutup ?></div>
+                <div class="stat-label">Item Tutup</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+            <div>
+                <div class="stat-value"><?= $total_donasi ?></div>
+                <div class="stat-label">Total Donasi Masuk</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <button class="btn-primary" onclick="openModal('modalTambah')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Tambah Kebutuhan
+        </button>
+        <div class="search-box">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+            <input type="text" id="searchInput" placeholder="Cari nama barang..." oninput="filterTable()">
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <?php if (empty($katalog_list)): ?>
+        <div class="empty-state">
+            <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            <p>Belum ada katalog kebutuhan. Tambahkan item pertama Anda.</p>
+        </div>
+        <?php else: ?>
+        <table id="tabelKatalog">
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Kategori</th>
+                    <th>Urgensi</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($katalog_list as $item):
+                    $pct = ($item['target_butuh'] > 0) ? min(100, round(($item['jumlah_terkumpul'] / $item['target_butuh']) * 100)) : 0;
+                    $urgensi_label = ['high' => 'Mendesak', 'med' => 'Sedang', 'low' => 'Normal'][$item['urgensi']] ?? $item['urgensi'];
+                    $kat_label = ucfirst($item['kategori'] ?? '-');
+                ?>
+                <tr data-name="<?= strtolower(htmlspecialchars($item['nama_barang'])) ?>">
+                    <td>
+                        <div style="font-weight:600;color:var(--forest)"><?= htmlspecialchars($item['nama_barang']) ?></div>
+                        <?php if (!empty($item['deskripsi'])): ?>
+                        <div style="font-size:12px;color:var(--muted);margin-top:2px"><?= htmlspecialchars(mb_substr($item['deskripsi'],0,60)) ?>...</div>
+                        <?php endif; ?>
+                    </td>
+                    <td><span class="badge-kat"><?= $kat_label ?></span></td>
+                    <td>
+                        <span class="badge-urgensi urgensi-<?= $item['urgensi'] ?>">
+                            <?= $urgensi_label ?>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="progress-wrap">
+                            <div class="progress-label"><?= $item['jumlah_terkumpul'] ?> / <?= $item['target_butuh'] ?> unit (<?= $pct ?>%)</div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:<?= $pct ?>%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-status <?= $item['aktif'] ? 'status-aktif' : 'status-tutup' ?>">
+                            <?= $item['aktif'] ? 'Aktif' : 'Tutup' ?>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="aksi-group">
+                            <button class="btn-icon" title="Edit" onclick='openEditModal(<?= json_encode($item) ?>)'>
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                            </button>
+                            <button class="btn-icon warning" title="<?= $item['aktif'] ? 'Tutup' : 'Buka' ?>" onclick="toggleKatalog(<?= $item['id'] ?>, this)">
+                                <?php if ($item['aktif']): ?>
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                <?php else: ?>
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <?php endif; ?>
+                            </button>
+                            <a href="hapus_kebutuhan.php?id=<?= $item['id'] ?>" class="btn-icon danger" title="Hapus" onclick="return confirm('Hapus item ini? Aksi tidak dapat dibatalkan.')">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php endif; ?>
+    </div>
+</main>
+
+<!-- MODAL TAMBAH -->
+<div class="modal-overlay" id="modalTambah">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Tambah Kebutuhan Baru</h2>
+            <button class="modal-close" onclick="closeModal('modalTambah')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form action="../backend/proses_tambah_kebutuhan.php" method="POST">
+            <div class="form-group">
+                <label class="form-label">Nama Barang <span style="color:var(--red)">*</span></label>
+                <input type="text" name="nama_barang" class="form-control" placeholder="Contoh: Baju Anak Ukuran M" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Kategori <span style="color:var(--red)">*</span></label>
+                    <select name="kategori" class="form-control" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="pakaian">Pakaian</option>
+                        <option value="buku">Buku</option>
+                        <option value="elektronik">Elektronik</option>
+                        <option value="perabot">Perabot</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Urgensi <span style="color:var(--red)">*</span></label>
+                    <select name="urgensi" class="form-control" required>
+                        <option value="">-- Pilih Urgensi --</option>
+                        <option value="high">Mendesak</option>
+                        <option value="med">Sedang</option>
+                        <option value="low">Normal</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Target Kebutuhan (unit) <span style="color:var(--red)">*</span></label>
+                <input type="number" name="target_butuh" class="form-control" min="1" placeholder="Contoh: 50" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea name="deskripsi" class="form-control" rows="3" placeholder="Jelaskan kondisi atau spesifikasi barang yang dibutuhkan..."></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-ghost" onclick="closeModal('modalTambah')">Batal</button>
+                <button type="submit" class="btn-primary">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Simpan Kebutuhan
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<!-- MODAL EDIT -->
+<div class="modal-overlay" id="modalEdit">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Kebutuhan</h2>
+            <button class="modal-close" onclick="closeModal('modalEdit')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form action="../backend/edit_kebutuhan.php" method="POST">
+            <input type="hidden" name="id" id="edit_id">
+            <div class="form-group">
+                <label class="form-label">Nama Barang <span style="color:var(--red)">*</span></label>
+                <input type="text" name="nama_barang" id="edit_nama" class="form-control" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select name="kategori" id="edit_kategori" class="form-control">
+                        <option value="pakaian">Pakaian</option>
+                        <option value="buku">Buku</option>
+                        <option value="elektronik">Elektronik</option>
+                        <option value="perabot">Perabot</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Urgensi</label>
+                    <select name="urgensi" id="edit_urgensi" class="form-control">
+                        <option value="high">Mendesak</option>
+                        <option value="med">Sedang</option>
+                        <option value="low">Normal</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Target Kebutuhan (unit)</label>
+                <input type="number" name="target_butuh" id="edit_target" class="form-control" min="1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Deskripsi</label>
+                <textarea name="deskripsi" id="edit_deskripsi" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-ghost" onclick="closeModal('modalEdit')">Batal</button>
+                <button type="submit" class="btn-primary">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('open');
+    });
+});
+
+function openEditModal(data) {
+    document.getElementById('edit_id').value = data.id;
+    document.getElementById('edit_nama').value = data.nama_barang;
+    document.getElementById('edit_kategori').value = data.kategori;
+    document.getElementById('edit_urgensi').value = data.urgensi;
+    document.getElementById('edit_target').value = data.target_butuh;
+    document.getElementById('edit_deskripsi').value = data.deskripsi || '';
+    openModal('modalEdit');
+}
+
+function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('#tabelKatalog tbody tr').forEach(row => {
+        row.style.display = row.dataset.name.includes(q) ? '' : 'none';
+    });
+}
+
+function showToast(msg, type = 'success') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    const icon = type === 'success'
+        ? '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        : '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+    t.innerHTML = `<span class="toast-icon">${icon}</span><span class="toast-msg">${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+function toggleKatalog(id, btn) {
+    fetch('../backend/toggle_kebutuhan.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: id})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || 'Status berhasil diubah');
+            setTimeout(() => location.reload(), 800);
+        } else {
+            showToast(data.message || 'Gagal mengubah status', 'error');
+        }
+    })
+    .catch(() => showToast('Terjadi kesalahan koneksi', 'error'));
+}
+
+<?php if ($flash): ?>
+showToast(<?= json_encode($flash['msg']) ?>, <?= json_encode($flash['type'] ?? 'success') ?>);
+<?php endif; ?>
+</script>
 </body>
 </html>

@@ -47,9 +47,7 @@ $response = [];
 
 try {
 
-    /* ════════════════════════════════════
-       ROLE: DONATUR
-    ════════════════════════════════════ */
+    /*ROLE: DONATUR */
     if ($role === 'donatur') {
 
         $total = queryOne($koneksi,
@@ -97,9 +95,7 @@ try {
             'riwayat' => $riwayat,
         ];
 
-    /* ════════════════════════════════════
-       ROLE: PENERIMA
-    ════════════════════════════════════ */
+    /*ROLE: PENERIMA */
     } elseif ($role === 'penerima') {
 
         $total = queryOne($koneksi,
@@ -190,9 +186,7 @@ try {
             'katalog' => $katalog,
         ];
 
-    /* ════════════════════════════════════
-       ROLE: ADMIN
-    ════════════════════════════════════ */
+    /*ROLE: ADMIN */
     } elseif ($role === 'admin') {
 
         $total_user = queryOne($koneksi, "SELECT COUNT(*) AS cnt FROM users");

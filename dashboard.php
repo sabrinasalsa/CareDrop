@@ -844,8 +844,33 @@ document.getElementById('profilForm')?.addEventListener('submit', async function
     const fd = new FormData(this);
     const res = await fetch('backend/update_profil.php', {method:'POST',body:fd});
     const data = await res.json();
-    if (data.ok) showToast('Profil berhasil diperbarui!');
-    else showToast(data.error || 'Gagal menyimpan', true);
+    if (data.ok) {
+      showToast('Profil berhasil diperbarui!');
+      
+      // Sinkronkan nama ke bagian bawah kiri (sidebar)
+      const sidebarName = document.querySelector('.sidebar-user .user-info strong');
+      if (sidebarName && data.nama) {
+        sidebarName.textContent = data.nama.substring(0, 20);
+      }
+
+      // Hitung inisial baru dari nama baru
+      const namaBaru = data.nama || '';
+      const inisialBaru = namaBaru.substring(0, 2).toUpperCase();
+
+      // Sinkronkan inisial di sidebar jika tidak menggunakan foto
+      const sideAv = document.querySelector('.sidebar-user .user-av');
+      if (sideAv && !sideAv.querySelector('img')) {
+        sideAv.textContent = inisialBaru;
+      }
+
+      // Sinkronkan inisial di halaman profil jika tidak menggunakan foto
+      const profAvInit = document.getElementById('profilAvatarInitial');
+      if (profAvInit) {
+        profAvInit.textContent = inisialBaru;
+      }
+    } else {
+      showToast(data.error || 'Gagal menyimpan', true);
+    }
   } catch(err) { showToast('Koneksi error', true); }
   btn.disabled = false; btn.textContent = 'Simpan Perubahan';
 });

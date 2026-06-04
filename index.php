@@ -63,28 +63,9 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
 
   <div class="hero-actions" data-aos="fade-up" data-aos-duration="700" data-aos-delay="300">
     <a href="login.php?tab=register&role=donatur" class="btn-hero-primary">
-      Ayo Mulai Berdonasi →
+      Ayo Mulai Berdonasi
     </a>
     <a href="#cara-kerja" class="btn-hero-ghost">Lihat Cara Kerja</a>
-  </div>
-
-  <div class="hero-stats" data-aos="fade-up" data-aos-duration="700" data-aos-delay="420">
-    <div class="hstat">
-      <strong>500+</strong>
-      <span>Donatur Aktif</span>
-    </div>
-    <div class="hstat">
-      <strong>120+</strong>
-      <span>Yayasan Terverifikasi</span>
-    </div>
-    <div class="hstat">
-      <strong>8.000+</strong>
-      <span>Barang Tersalurkan</span>
-    </div>
-    <div class="hstat">
-      <strong>98%</strong>
-      <span>Donasi Selesai</span>
-    </div>
   </div>
 
   <div class="hero-wave">
@@ -96,11 +77,11 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
 
 <div class="trust-bar" data-aos="fade-up" data-aos-duration="500">
   <div class="trust-inner">
-    <div class="trust-item"><span>✅</span> Yayasan Terverifikasi</div>
-    <div class="trust-item"><span>🔒</span> Data Aman & Terlindungi</div>
-    <div class="trust-item"><span>📦</span> Lacak Real-time</div>
-    <div class="trust-item"><span>🏅</span> E-Sertifikat Resmi</div>
-    <div class="trust-item"><span>🎯</span> Donasi Tepat Sasaran</div>
+    <div class="trust-item"><span><img src="uploads/icon/verified.png" alt=""></span> Yayasan Terverifikasi</div>
+    <div class="trust-item"><span><img src="uploads/icon/shield.png" alt=""></span> Data Aman & Terlindungi</div>
+    <div class="trust-item"><span><img src="uploads/icon/tracking.png" alt=""></span> Lacak Real-time</div>
+    <div class="trust-item"><span><img src="uploads/icon/certificate.png" alt=""></span> E-Sertifikat Resmi</div>
+    <div class="trust-item"><span><img src="uploads/icon/target.png" alt=""></span> Donasi Tepat Sasaran</div>
   </div>
 </div>
 
@@ -118,22 +99,22 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
 
     <div class="features-grid">
       <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
-        <div class="feat-icon">✅</div>
+        <div class="feat-icon"><img src="uploads/icon/verified.png" alt=""></div>
         <h3>Yayasan Terverifikasi</h3>
         <p>Setiap penerima donasi melalui proses verifikasi ketat oleh tim admin CareDrop sebelum dapat bergabung di platform kami.</p>
       </div>
       <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
-        <div class="feat-icon">📦</div>
+        <div class="feat-icon"><img src="uploads/icon/tracking.png" alt=""></div>
         <h3>Lacak Real-time</h3>
         <p>Pantau status donasi dari diterima, diproses, dikirim, hingga selesai secara transparan — seperti lacak paket online.</p>
       </div>
       <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
-        <div class="feat-icon">🏅</div>
+        <div class="feat-icon"><img src="uploads/icon/certificate.png" alt=""></div>
         <h3>Sertifikat Donasi</h3>
         <p>Dapatkan e-sertifikat resmi sebagai bukti kontribusi nyata kamu terhadap sesama yang bisa disimpan atau dibagikan.</p>
       </div>
       <div class="feature-card" data-aos="fade-up" data-aos-delay="240">
-        <div class="feat-icon">🎯</div>
+        <div class="feat-icon"><img src="uploads/icon/target.png" alt=""></div>
         <h3>Donasi Tepat Sasaran</h3>
         <p>Pilih langsung dari katalog kebutuhan yayasan agar barang yang didonasikan benar-benar dibutuhkan dan tepat guna.</p>
       </div>
@@ -200,25 +181,6 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
     <p class="section-sub light" style="margin:0 auto 52px;" data-aos="fade-up" data-aos-delay="140">
       Angka-angka ini bukan sekadar statistik — di baliknya ada ribuan anak yang kini sekolah dengan seragam baru, buku pelajaran, dan harapan yang tumbuh.
     </p>
-
-    <div class="stats-grid">
-      <div class="stat-card" data-aos="zoom-in" data-aos-delay="0">
-        <strong>500+</strong>
-        <span>Donatur Aktif</span>
-      </div>
-      <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
-        <strong>120+</strong>
-        <span>Yayasan & Panti</span>
-      </div>
-      <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
-        <strong>8.000+</strong>
-        <span>Barang Tersalurkan</span>
-      </div>
-      <div class="stat-card" data-aos="zoom-in" data-aos-delay="300">
-        <strong>98%</strong>
-        <span>Donasi Selesai</span>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -278,18 +240,18 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
 
     <div class="roles-grid">
       <div class="role-card" data-aos="fade-right" data-aos-duration="700">
-        <div class="role-icon donatur">🤝</div>
+        <div class="role-icon donatur"><img src="uploads/icon/handshake.png" alt=""></div>
         <h3>Donatur</h3>
         <p>Individu atau organisasi yang ingin menyalurkan barang layak pakai kepada yang membutuhkan secara langsung dan terverifikasi.</p>
-        <a href="login.php?tab=register&role=donatur" class="btn-role">Daftar sebagai Donatur →</a>
+        <a href="login.php?tab=register&role=donatur" class="btn-role">Daftar sebagai Donatur </a>
       </div>
 
       <div class="role-card featured" data-aos="fade-left" data-aos-duration="700">
-        <div class="role-badge">✨ Paling Banyak</div>
-        <div class="role-icon yayasan">🏠</div>
+        <div class="role-badge"> Paling Banyak</div>
+        <div class="role-icon yayasan"><img src="uploads/icon/home.png" alt=""></div>
         <h3>Yayasan / Panti</h3>
         <p>Lembaga sosial terverifikasi yang dapat mengajukan kebutuhan barang spesifik untuk penerima manfaat secara mudah dan terpercaya.</p>
-        <a href="login.php?tab=register&role=penerima" class="btn-role green">Daftar sebagai Yayasan →</a>
+        <a href="login.php?tab=register&role=penerima" class="btn-role green">Daftar sebagai Yayasan </a>
       </div>
     </div>
   </div>
@@ -358,7 +320,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
       <h2>Siap Membuat Perbedaan?</h2>
       <p>Bergabunglah bersama ribuan donatur yang sudah menyentuh kehidupan banyak orang lewat CareDrop. Mulai perjalananmu hari ini — gratis.</p>
       <div class="cta-actions">
-        <a href="login.php?tab=register" class="btn-cta-white">🎁 Ayo Donasi Sekarang →</a>
+        <a href="login.php?tab=register" class="btn-cta-white"><img src="uploads/icon/gift.png" alt=""> Ayo Donasi Sekarang </a>
         <a href="login.php" class="btn-cta-outline">Sudah punya akun? Masuk</a>
       </div>
     </div>

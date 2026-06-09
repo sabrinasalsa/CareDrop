@@ -1,12 +1,40 @@
 <?php
+/**
+ * CareDrop – backend/koneksi.php
+ * Menyediakan dua koneksi database:
+ *  - $pdo     : PDO (digunakan oleh file-file backend PDO)
+ *  - $koneksi : MySQLi (digunakan oleh file-file yang memakai MySQLi)
+ */
+
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
 $db_name = 'caredrop';
 
-$koneksi = new mysqli($db_host, $db_user, $db_pass, $db_name);
-$koneksi->set_charset('utf8mb4');
+// ── PDO connection ──────────────────────────────────────────────────────────
+try {
+    $pdo = new PDO(
+        "mysql:host={$db_host};dbname={$db_name};charset=utf8mb4",
+        $db_user,
+        $db_pass,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+} catch (PDOException $e) {
+    if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Database connection failed']);
+        exit;
+    }
+    die("KONEKSI KE DATABASE GAGAL: " . $e->getMessage());
+}
 
+// ── MySQLi connection ($koneksi) ────────────────────────────────────────────
+$koneksi = new mysqli($db_host, $db_user, $db_pass, $db_name);
 if ($koneksi->connect_error) {
     if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
         header('Content-Type: application/json');
@@ -14,5 +42,6 @@ if ($koneksi->connect_error) {
         echo json_encode(['error' => 'Database connection failed']);
         exit;
     }
-    die("KONEKSI KE DATABASE GAGAL: " . $koneksi->connect_error);
+    die("KONEKSI MYSQLI GAGAL: " . $koneksi->connect_error);
 }
+$koneksi->set_charset('utf8mb4');

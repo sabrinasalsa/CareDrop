@@ -1,49 +1,67 @@
 <?php
-ob_start(); ini_set('display_errors',0); error_reporting(0);
-session_start(); require_once __DIR__.'/koneksi.php'; ob_end_clean();
+/**
+ * CareDrop – backend/ganti_password.php
+ * Ganti password: PDO, CSRF, validasi kekuatan password (min 8, ada angka)
+ */
+session_start();
+require_once __DIR__ . '/koneksi.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isset($_SESSION['id'])) {
-    echo json_encode(['ok'=>false,'error'=>'Belum login']); exit;
-}
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['ok'=>false,'error'=>'Method tidak valid']); exit;
-}
+// ── Autentikasi ──
+if (!isset($_SESSION['id'])) { json_error('Belum login', 401); }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { json_error('Method tidak valid', 405); }
 
-$user_id  = (int)$_SESSION['id'];
-$lama     = $_POST['password_lama']    ?? '';
-$baru     = $_POST['password_baru']    ?? '';
-$konfirm  = $_POST['password_konfirm'] ?? '';
 
+$user_id = (int)$_SESSION['id'];
+$lama    = $_POST['password_lama']    ?? '';
+$baru    = $_POST['password_baru']    ?? '';
+$konfirm = $_POST['password_konfirm'] ?? '';
+
+// ── Validasi input ──
 if (empty($lama) || empty($baru)) {
-    echo json_encode(['ok'=>false,'error'=>'Password lama dan baru wajib diisi']); exit;
+    json_error('Password lama dan baru wajib diisi');
 }
-if (strlen($baru) < 6) {
-    echo json_encode(['ok'=>false,'error'=>'Password baru minimal 6 karakter']); exit;
+if (strlen($baru) < 8) {
+    json_error('Password baru minimal 8 karakter');
 }
-if ($baru !== $konfirm) {
-    echo json_encode(['ok'=>false,'error'=>'Konfirmasi password tidak cocok']); exit;
+if (!preg_match('/[0-9]/', $baru)) {
+    json_error('Password baru harus mengandung minimal 1 angka');
+}
+if (!preg_match('/[A-Za-z]/', $baru)) {
+    json_error('Password baru harus mengandung minimal 1 huruf');
+}
+if ($baru === $lama) {
+    json_error('Password baru tidak boleh sama dengan password lama');
+}
+if (!empty($konfirm) && $baru !== $konfirm) {
+    json_error('Konfirmasi password tidak cocok');
 }
 
 try {
-    $stmt = $koneksi->prepare("SELECT password FROM users WHERE id = ?");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    // Ambil hash password saat ini
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $row = $stmt->fetch();
 
     if (!$row || !password_verify($lama, $row['password'])) {
-        echo json_encode(['ok'=>false,'error'=>'Password lama tidak sesuai']); exit;
+        json_error('Password lama tidak sesuai', 401);
     }
 
-    $hash = password_hash($baru, PASSWORD_DEFAULT);
-    $upd  = $koneksi->prepare("UPDATE users SET password = ? WHERE id = ?");
-    $upd->bind_param("si", $hash, $user_id);
-    $upd->execute();
-    $upd->close();
-    $koneksi->close();
+    // Hash password baru dengan bcrypt
+    $hash = password_hash($baru, PASSWORD_BCRYPT, ['cost' => 12]);
 
-    echo json_encode(['ok'=>true,'msg'=>'Password berhasil diubah.']);
-} catch(Throwable $e) {
-    echo json_encode(['ok'=>false,'error'=>$e->getMessage()]);
+    $upd = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $upd->execute([$hash, $user_id]);
+
+    // Regenerate session ID setelah ganti password (keamanan)
+    session_regenerate_id(true);
+    $_SESSION['last_activity'] = time();
+
+    $pdo = null;
+    echo json_encode(['ok' => true, 'msg' => 'Password berhasil diubah.']);
+
+} catch (PDOException $e) {
+    $pdo = null;
+    json_error('Server error. Silakan coba lagi.', 500);
 }

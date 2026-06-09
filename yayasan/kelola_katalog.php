@@ -12,42 +12,42 @@ $badge_menunggu = $badge_dikirim = 0;
 $katalog_list = [];
 
 try {
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=?");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $total_item = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=?");
+    $r->execute([$yayasan_id]);
+    $total_item = (int)($r->fetch()['n'] ?? 0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=? AND aktif=1");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $item_aktif = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE yayasan_id=? AND aktif=1");
+    $r->execute([$yayasan_id]);
+    $item_aktif = (int)($r->fetch()['n'] ?? 0);
 
     $item_tutup = $total_item - $item_aktif;
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi d
         JOIN katalog_kebutuhan k ON d.katalog_id = k.id
         WHERE k.yayasan_id = ? AND d.status_donasi NOT IN ('dibatalkan','ditolak')");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $total_donasi = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r->execute([$yayasan_id]);
+    $total_donasi = (int)($r->fetch()['n'] ?? 0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi d
         JOIN katalog_kebutuhan k ON d.katalog_id = k.id
         WHERE k.yayasan_id = ? AND d.status_donasi = 'menunggu'");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $badge_menunggu = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r->execute([$yayasan_id]);
+    $badge_menunggu = (int)($r->fetch()['n'] ?? 0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi d
         JOIN katalog_kebutuhan k ON d.katalog_id = k.id
         WHERE k.yayasan_id = ? AND d.status_donasi = 'dikirim'");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $badge_dikirim = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r->execute([$yayasan_id]);
+    $badge_dikirim = (int)($r->fetch()['n'] ?? 0);
 
-    $r = $koneksi->prepare("SELECT k.*,
+    $r = $pdo->prepare("SELECT k.*,
            (SELECT COUNT(*) FROM donasi d WHERE d.katalog_id = k.id
             AND d.status_donasi NOT IN ('dibatalkan','ditolak')) as total_donasi_item
         FROM katalog_kebutuhan k
         WHERE k.yayasan_id = ?
         ORDER BY k.created_at DESC");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $katalog_list = $r->get_result()->fetch_all(MYSQLI_ASSOC); $r->close();
+    $r->execute([$yayasan_id]);
+    $katalog_list = $r->fetchAll();
 
 } catch (Exception $e) {
 

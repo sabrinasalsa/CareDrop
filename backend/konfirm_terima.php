@@ -2,61 +2,53 @@
 /**
  * CareDrop – backend/konfirm_terima.php
  * Penerima mengkonfirmasi terima donasi → update status_donasi = 'selesai'
+ * PDO, CSRF, role penerima
  */
-ob_start();
-ini_set('display_errors', 0);
-error_reporting(0);
 session_start();
 require_once __DIR__ . '/koneksi.php';
-ob_end_clean();
+
 header('Content-Type: application/json; charset=utf-8');
 
+// ── Autentikasi & otorisasi ──
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penerima') {
-    echo json_encode(['ok' => false, 'error' => 'Akses ditolak']); exit;
+    json_error('Akses ditolak', 403);
 }
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['ok' => false, 'error' => 'Method salah']); exit;
-}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { json_error('Method tidak valid', 405); }
 
-$donasi_id  = htmlspecialchars(trim($_POST['donasi_id'] ?? ''));
-$yayasan_id = (int) $_SESSION['id'];
 
-if (empty($donasi_id)) {
-    echo json_encode(['ok' => false, 'error' => 'ID donasi tidak valid']); exit;
-}
+$donasi_id  = trim($_POST['donasi_id'] ?? '');
+$yayasan_id = (int)$_SESSION['id'];
+
+if (empty($donasi_id)) { json_error('ID donasi tidak valid'); }
 
 try {
-    // Pastikan donasi ini memang milik yayasan yang login
-    $stmt = $koneksi->prepare(
+    // Pastikan donasi ini memang milik yayasan yang login & statusnya 'dikirim'
+    $stmt = $pdo->prepare(
         "UPDATE donasi d
          JOIN katalog_kebutuhan k ON k.id = d.katalog_id
          SET d.status_donasi = 'selesai'
          WHERE d.id = ? AND k.yayasan_id = ? AND d.status_donasi = 'dikirim'"
     );
-    $stmt->bind_param("si", $donasi_id, $yayasan_id);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
+    $stmt->execute([$donasi_id, $yayasan_id]);
 
-    if ($affected > 0) {
-        // Update jumlah_terkumpul di katalog
-        $upd = $koneksi->prepare(
+    if ($stmt->rowCount() > 0) {
+        // Tambah jumlah_terkumpul di katalog
+        $upd = $pdo->prepare(
             "UPDATE katalog_kebutuhan k
              JOIN donasi d ON d.katalog_id = k.id
              SET k.jumlah_terkumpul = k.jumlah_terkumpul + d.qty_donasi
              WHERE d.id = ?"
         );
-        $upd->bind_param("s", $donasi_id);
-        $upd->execute();
-        $upd->close();
+        $upd->execute([$donasi_id]);
 
-        $koneksi->close();
+        $pdo = null;
         echo json_encode(['ok' => true, 'message' => 'Donasi berhasil dikonfirmasi!']);
     } else {
-        $koneksi->close();
-        echo json_encode(['ok' => false, 'error' => 'Donasi tidak ditemukan atau bukan milik yayasan ini']);
+        $pdo = null;
+        json_error('Donasi tidak ditemukan atau bukan milik yayasan ini');
     }
 
-} catch (Throwable $e) {
-    echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+} catch (PDOException $e) {
+    $pdo = null;
+    json_error('Server error. Silakan coba lagi.', 500);
 }

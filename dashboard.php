@@ -1,9 +1,4 @@
 <?php
-/**
- * CareDrop – dashboard.php
- * Dashboard lengkap untuk role DONATUR
- * Tab: beranda | ajukan | tawaran | lacak | riwayat | sertifikat | profil
- */
 session_start();
 if (!isset($_SESSION['id']))          { header('Location: login.php'); exit; }
 if ($_SESSION['role'] === 'admin')    { header('Location: admin/index.php'); exit; }
@@ -12,12 +7,9 @@ if ($_SESSION['role'] === 'penerima') { header('Location: yayasan/kelola_katalog
 require_once __DIR__ . '/backend/koneksi.php';
 
 // Validasi: pastikan user ID di session masih ada di database
-// (mencegah error jika session lama / database di-reset)
-$_chk = $koneksi->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
-$_chk->bind_param("i", $_SESSION['id']);
-$_chk->execute();
-$_valid = $_chk->get_result()->fetch_assoc();
-$_chk->close();
+$_chk = $pdo->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
+$_chk->execute([$_SESSION['id']]);
+$_valid = $_chk->fetch();
 if (!$_valid) {
     session_unset(); session_destroy();
     header('Location: login.php?flash=timeout'); exit;
@@ -34,7 +26,7 @@ if (!in_array($tab, $allowed)) $tab = 'beranda';
 
 $inisial = mb_strtoupper(mb_substr($nama, 0, 2));
 
-// ── Load data sesuai tab ─────────────────────────────────────────────────────
+// Load data sesuai tab
 $stats   = [];
 $riwayat = [];
 $katalog = [];
@@ -43,25 +35,21 @@ $selesai = [];
 $profil  = [];
 
 if ($tab === 'beranda' || $tab === 'tawaran' || $tab === 'riwayat') {
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=?");
-    $r->bind_param("i",$user_id); $r->execute();
-    $stats['total'] = (int)($r->get_result()->fetch_assoc()['n']??0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=?");
+    $r->execute([$user_id]); $stats['total'] = (int)($r->fetch()['n']??0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi NOT IN('selesai','dibatalkan','ditolak')");
-    $r->bind_param("i",$user_id); $r->execute();
-    $stats['berjalan'] = (int)($r->get_result()->fetch_assoc()['n']??0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi NOT IN('selesai','dibatalkan','ditolak')");
+    $r->execute([$user_id]); $stats['berjalan'] = (int)($r->fetch()['n']??0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi='selesai'");
-    $r->bind_param("i",$user_id); $r->execute();
-    $stats['selesai'] = (int)($r->get_result()->fetch_assoc()['n']??0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi='selesai'");
+    $r->execute([$user_id]); $stats['selesai'] = (int)($r->fetch()['n']??0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi='disetujui'");
-    $r->bind_param("i",$user_id); $r->execute();
-    $stats['perlu_resi'] = (int)($r->get_result()->fetch_assoc()['n']??0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi WHERE donatur_id=? AND status_donasi='disetujui'");
+    $r->execute([$user_id]); $stats['perlu_resi'] = (int)($r->fetch()['n']??0);
 }
 
 if ($tab === 'beranda') {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT d.id AS donasi_id,d.qty_donasi,d.status_donasi,d.created_at,
                 COALESCE(k.nama_barang,'—') AS nama_barang,
                 COALESCE(u.nama_lengkap,'—') AS nama_yayasan,
@@ -72,12 +60,12 @@ if ($tab === 'beranda') {
          LEFT JOIN pengiriman p ON p.donasi_id=d.id
          WHERE d.donatur_id=? ORDER BY d.created_at DESC LIMIT 5"
     );
-    $stmt->bind_param("i",$user_id); $stmt->execute();
-    $riwayat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
+    $stmt->execute([$user_id]);
+    $riwayat = $stmt->fetchAll();
 }
 
 if ($tab === 'ajukan') {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT k.id,k.nama_barang,k.kategori,k.urgensi,k.target_butuh,k.jumlah_terkumpul,k.deskripsi,
                 u.nama_lengkap AS nama_yayasan,u.alamat AS kota_yayasan
          FROM katalog_kebutuhan k
@@ -86,11 +74,11 @@ if ($tab === 'ajukan') {
          ORDER BY FIELD(k.urgensi,'high','med','low'),k.id DESC LIMIT 30"
     );
     $stmt->execute();
-    $katalog = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
+    $katalog = $stmt->fetchAll();
 }
 
 if ($tab === 'tawaran') {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT d.id AS donasi_id,d.qty_donasi,d.status_donasi,d.alasan_tolak,d.created_at,
                 COALESCE(k.nama_barang,'—') AS nama_barang,
                 COALESCE(u.nama_lengkap,'—') AS nama_yayasan,
@@ -101,12 +89,12 @@ if ($tab === 'tawaran') {
          LEFT JOIN pengiriman p ON p.donasi_id=d.id
          WHERE d.donatur_id=? ORDER BY d.created_at DESC LIMIT 50"
     );
-    $stmt->bind_param("i",$user_id); $stmt->execute();
-    $tawaran = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
+    $stmt->execute([$user_id]);
+    $tawaran = $stmt->fetchAll();
 }
 
 if ($tab === 'riwayat') {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT d.id AS donasi_id,d.qty_donasi,d.status_donasi,d.created_at,
                 COALESCE(k.nama_barang,'—') AS nama_barang,
                 COALESCE(u.nama_lengkap,'—') AS nama_yayasan,
@@ -117,12 +105,12 @@ if ($tab === 'riwayat') {
          LEFT JOIN pengiriman p ON p.donasi_id=d.id
          WHERE d.donatur_id=? ORDER BY d.created_at DESC"
     );
-    $stmt->bind_param("i",$user_id); $stmt->execute();
-    $riwayat = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
+    $stmt->execute([$user_id]);
+    $riwayat = $stmt->fetchAll();
 }
 
 if ($tab === 'sertifikat') {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT d.id AS donasi_id,d.qty_donasi,d.updated_at AS tgl_selesai,
                 COALESCE(k.nama_barang,'—') AS nama_barang,
                 COALESCE(u.nama_lengkap,'—') AS nama_yayasan
@@ -132,17 +120,17 @@ if ($tab === 'sertifikat') {
          WHERE d.donatur_id=? AND d.status_donasi='selesai'
          ORDER BY d.updated_at DESC"
     );
-    $stmt->bind_param("i",$user_id); $stmt->execute();
-    $selesai = $stmt->get_result()->fetch_all(MYSQLI_ASSOC); $stmt->close();
+    $stmt->execute([$user_id]);
+    $selesai = $stmt->fetchAll();
 }
 
 if ($tab === 'profil') {
-    $stmt = $koneksi->prepare("SELECT nama_lengkap,email,no_telp,alamat,avatar FROM users WHERE id=?");
-    $stmt->bind_param("i",$user_id); $stmt->execute();
-    $profil = $stmt->get_result()->fetch_assoc() ?? []; $stmt->close();
+    $stmt = $pdo->prepare("SELECT nama_lengkap,email,no_telp,alamat,avatar FROM users WHERE id=?");
+    $stmt->execute([$user_id]);
+    $profil = $stmt->fetch() ?? [];
 }
 
-$koneksi->close();
+$pdo = null;
 
 // Status map
 $stMap = [
@@ -892,8 +880,6 @@ document.getElementById('passForm')?.addEventListener('submit', async function(e
   btn.disabled = false; btn.textContent = 'Ubah Password';
 });
 
-// Upload avatar
-// Upload avatar — update foto langsung tanpa reload halaman
 async function uploadAvatar() {
   const file = document.getElementById('avatarFile').files[0];
   if (!file) return;
@@ -916,7 +902,7 @@ async function uploadAvatar() {
     if (data.ok) {
       // Gunakan URL dari server (bukan blob lokal) agar konsisten
       updateAvatarUI(data.url + '?t=' + Date.now());
-      showToast('✅ Foto profil berhasil diperbarui!');
+      showToast('Foto profil berhasil diperbarui!');
     } else {
       showToast(data.error || 'Gagal upload foto', true);
     }

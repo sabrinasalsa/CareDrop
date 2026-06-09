@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 $tab   = $_GET['tab']   ?? 'login';
 $role  = $_GET['role']  ?? 'donatur';
 $flash = $_GET['flash'] ?? '';
@@ -136,19 +137,8 @@ if (isset($_SESSION['id'])) {
       color: rgba(201,242,220,.8);
       backdrop-filter: blur(8px);
     }
-    .trust-pill span { font-size: 1rem; }
+    .trust-pill img { width: 22px; height: 22px; flex-shrink: 0; }
 
-    .deco-number {
-      position: absolute;
-      bottom: 40px; right: 40px;
-      z-index: 0;
-      font-family: var(--ff-display);
-      font-size: 11rem;
-      font-weight: 800;
-      color: rgba(255,255,255,.03);
-      line-height: 1;
-      user-select: none;
-    }
 
     /* ── Right panel (form) ── */
     .panel-right {
@@ -240,7 +230,8 @@ if (isset($_SESSION['id'])) {
       border-color: var(--moss);
       background: var(--mist);
     }
-    .role-opt .ro-icon { font-size: 1.6rem; margin-bottom: 6px; display: block; }
+    .role-opt .ro-icon { display: flex; justify-content: center; margin-bottom: 6px; }
+    .role-opt .ro-icon img { width: 36px; height: 36px; }
     .role-opt .ro-label { font-size: .82rem; font-weight: 700; color: var(--ink); display: block; }
     .role-opt .ro-desc  { font-size: .72rem; color: var(--muted); display: block; margin-top: 2px; }
 
@@ -282,13 +273,15 @@ if (isset($_SESSION['id'])) {
     .pass-wrap input { padding-right: 46px; }
     .pass-eye {
       position: absolute;
-      right: 14px; top: 50%;
+      right: 12px; top: 50%;
       transform: translateY(-50%);
       background: none; border: none;
-      cursor: pointer; font-size: 1.1rem;
-      color: var(--muted); padding: 0;
-      line-height: 1;
+      cursor: pointer; padding: 0;
+      display: flex; align-items: center;
+      opacity: .55; transition: opacity .2s;
     }
+    .pass-eye:hover { opacity: 1; }
+    .pass-eye img { width: 20px; height: 20px; }
 
     /* Password strength */
     .strength-bar { height: 3px; border-radius: 99px; background: #dde8e2; margin-top: 6px; overflow: hidden; }
@@ -371,7 +364,10 @@ if (isset($_SESSION['id'])) {
 </head>
 <body>
 <div class="panel-left">
-  <a href="index.php" class="logo">🌿 Care<span>Drop</span></a>
+  <a href="index.php" class="logo">
+    <img src="https://img.icons8.com/fluency/24/leaf.png" alt="" style="width:22px;height:22px">
+    Care<span>Drop</span>
+  </a>
 
   <h2>
     Salurkan Barang.<br>
@@ -384,25 +380,30 @@ if (isset($_SESSION['id'])) {
   </p>
 
   <div class="trust-pills">
-    <div class="trust-pill"><span>✅</span> Yayasan terverifikasi admin CareDrop</div>
-    <div class="trust-pill"><span>📦</span> Lacak donasi secara real-time</div>
-    <div class="trust-pill"><span>🏅</span> Dapatkan e-sertifikat resmi</div>
-    <div class="trust-pill"><span>🔒</span> Data Anda aman & terlindungi</div>
+    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/checked-2.png" alt=""> Yayasan terverifikasi admin CareDrop</div>
+    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/in-transit.png" alt=""> Lacak donasi secara real-time</div>
+    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/certificate.png" alt=""> Dapatkan e-sertifikat resmi</div>
+    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/lock-2.png" alt=""> Data Anda aman & terlindungi</div>
   </div>
 
-  <div class="deco-number">CD</div>
 </div>
 
 <!-- Right form panel -->
 <div class="panel-right">
   <div class="auth-box">
 
-    <a href="index.php" class="back-link">← Kembali ke Beranda</a>
+    <a href="index.php" class="back-link">Kembali ke Beranda</a>
 
     <?php if ($flash === 'registered'): ?>
-      <div class="flash flash-ok">🎉 Registrasi berhasil! Silakan masuk dengan akun Anda.</div>
+      <div class="flash flash-ok" style="display:flex;align-items:center;gap:8px">
+        <img src="https://img.icons8.com/fluency/32/ok.png" alt="" style="width:18px;height:18px;flex-shrink:0">
+        Registrasi berhasil! Silakan masuk dengan akun Anda.
+      </div>
     <?php elseif ($flash === 'timeout'): ?>
-      <div class="flash flash-err">⏱ Sesi Anda berakhir. Silakan masuk kembali.</div>
+      <div class="flash flash-err" style="display:flex;align-items:center;gap:8px">
+        <img src="https://img.icons8.com/fluency/32/alarm.png" alt="" style="width:18px;height:18px;flex-shrink:0">
+        Sesi Anda berakhir. Silakan masuk kembali.
+      </div>
     <?php endif; ?>
 
     <div class="tab-bar">
@@ -426,12 +427,15 @@ if (isset($_SESSION['id'])) {
           <label>Kata Sandi</label>
           <div class="pass-wrap">
             <input type="password" name="password" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
-            <button type="button" class="pass-eye" onclick="togglePass('loginPass', this)">👁</button>
+            <button type="button" class="pass-eye" onclick="togglePass('loginPass', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
+              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
+              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+            </button>
           </div>
         </div>
 
         <button type="submit" class="btn-submit">
-          <span>Masuk ke CareDrop</span> <span>→</span>
+          <span>Masuk ke CareDrop</span>
         </button>
       </form>
 
@@ -440,7 +444,7 @@ if (isset($_SESSION['id'])) {
       <p style="text-align:center;font-size:.875rem;color:var(--muted)">
         Belum punya akun?
         <a href="#" onclick="switchTab('register', document.querySelectorAll('.tab-btn')[1]); return false;"
-           style="color:var(--pine);font-weight:600;text-decoration:none">Daftar sekarang →</a>
+           style="color:var(--pine);font-weight:600;text-decoration:none">Daftar sekarang</a>
       </p>
     </div>
 
@@ -455,14 +459,14 @@ if (isset($_SESSION['id'])) {
           <label class="role-opt">
             <input type="radio" name="role" value="donatur"
                    <?= $role !== 'penerima' ? 'checked' : '' ?>>
-            <span class="ro-icon">🤝</span>
+            <span class="ro-icon"><img src="uploads/icon/home.png" alt="Donatur"></span>
             <span class="ro-label">Donatur</span>
             <span class="ro-desc">Saya ingin berdonasi</span>
           </label>
           <label class="role-opt">
             <input type="radio" name="role" value="penerima"
                    <?= $role === 'penerima' ? 'checked' : '' ?>>
-            <span class="ro-icon">🏠</span>
+            <span class="ro-icon"><img src="uploads/icon/handshake.png" alt="Yayasan"></span>
             <span class="ro-label">Yayasan</span>
             <span class="ro-desc">Kami menerima donasi</span>
           </label>
@@ -494,7 +498,10 @@ if (isset($_SESSION['id'])) {
           <div class="pass-wrap">
             <input type="password" name="password" id="regPass" placeholder="Minimal 6 karakter"
                    required minlength="6" oninput="checkStrength(this.value)">
-            <button type="button" class="pass-eye" onclick="togglePass('regPass', this)">👁</button>
+            <button type="button" class="pass-eye" onclick="togglePass('regPass', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
+              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
+              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+            </button>
           </div>
           <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
           <div class="strength-text" id="strengthText"></div>
@@ -504,16 +511,20 @@ if (isset($_SESSION['id'])) {
           <label>Konfirmasi Kata Sandi</label>
           <div class="pass-wrap">
             <input type="password" name="password_confirm" id="regPass2" placeholder="Ulangi kata sandi" required>
-            <button type="button" class="pass-eye" onclick="togglePass('regPass2', this)">👁</button>
+            <button type="button" class="pass-eye" onclick="togglePass('regPass2', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
+              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
+              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+            </button>
           </div>
         </div>
 
-        <div id="reg-note" style="font-size:.78rem;color:var(--muted);background:#f0fdf4;border:1px solid #c8e8d4;border-radius:8px;padding:10px 12px;margin-bottom:14px;display:none">
-          ℹ️ <strong>Akun Yayasan</strong> memerlukan verifikasi admin (1–3 hari kerja) sebelum dapat digunakan.
+        <div id="reg-note" style="display:none;font-size:.78rem;color:var(--muted);background:#f0fdf4;border:1px solid #c8e8d4;border-radius:8px;padding:10px 12px;margin-bottom:14px;align-items:flex-start;gap:8px">
+          <img src="https://img.icons8.com/fluency/32/info.png" alt="" style="width:16px;height:16px;flex-shrink:0;margin-top:1px">
+          <span><strong>Akun Yayasan</strong> memerlukan verifikasi admin (1–3 hari kerja) sebelum dapat digunakan.</span>
         </div>
 
         <button type="submit" class="btn-submit" id="regBtn">
-          <span>Daftar Sekarang</span> <span>→</span>
+          <span>Daftar Sekarang</span>
         </button>
       </form>
 
@@ -546,8 +557,17 @@ if (isset($_SESSION['id'])) {
 
   function togglePass(id, btn) {
     const inp = document.getElementById(id);
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
-    else { inp.type = 'password'; btn.textContent = '👁'; }
+    const on  = btn.querySelector('.eye-on');
+    const off = btn.querySelector('.eye-off');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      on.style.display  = 'none';
+      off.style.display = 'inline';
+    } else {
+      inp.type = 'password';
+      on.style.display  = 'inline';
+      off.style.display = 'none';
+    }
   }
   function checkStrength(val) {
     const fill = document.getElementById('strengthFill');
@@ -576,13 +596,13 @@ if (isset($_SESSION['id'])) {
   document.querySelectorAll('input[name="role"]').forEach(r => {
     r.addEventListener('change', () => {
       const note = document.getElementById('reg-note');
-      note.style.display = r.value === 'penerima' ? 'block' : 'none';
+      note.style.display = r.value === 'penerima' ? 'flex' : 'none';
     });
   });
 
   const checkedRole = document.querySelector('input[name="role"]:checked');
   if (checkedRole && checkedRole.value === 'penerima') {
-    document.getElementById('reg-note').style.display = 'block';
+    document.getElementById('reg-note').style.display = 'flex';
   }
 
   document.getElementById('registerForm').addEventListener('submit', function(e) {

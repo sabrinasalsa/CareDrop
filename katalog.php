@@ -1,8 +1,4 @@
 <?php
-/**
- * CareDrop – katalog.php
- * Halaman publik katalog kebutuhan barang — bisa diakses tanpa login
- */
 session_start();
 require_once __DIR__ . '/backend/koneksi.php';
 
@@ -15,24 +11,20 @@ $search     = htmlspecialchars(trim($_GET['q'] ?? ''));
 
 $where  = "WHERE k.jumlah_terkumpul < k.target_butuh AND (k.aktif = 1 OR k.status_aktif = 1) AND u.status_verifikasi = 'verified'";
 $params = [];
-$types  = '';
 
 if ($filter_kat && in_array($filter_kat, ['pakaian','buku','elektronik','perabot','lainnya'])) {
     $where   .= " AND k.kategori = ?";
     $params[] = $filter_kat;
-    $types   .= 's';
 }
 if ($filter_urg && in_array($filter_urg, ['high','med','low'])) {
     $where   .= " AND k.urgensi = ?";
     $params[] = $filter_urg;
-    $types   .= 's';
 }
 if ($search) {
     $like     = "%$search%";
     $where   .= " AND (k.nama_barang LIKE ? OR u.nama_lengkap LIKE ?)";
     $params[] = $like;
     $params[] = $like;
-    $types   .= 'ss';
 }
 
 $sql = "SELECT k.id, k.nama_barang, k.kategori, k.urgensi, k.target_butuh, k.jumlah_terkumpul, k.deskripsi,
@@ -43,17 +35,15 @@ $sql = "SELECT k.id, k.nama_barang, k.kategori, k.urgensi, k.target_butuh, k.jum
         ORDER BY FIELD(k.urgensi,'high','med','low'), k.id DESC
         LIMIT 60";
 
-$stmt = $koneksi->prepare($sql);
-if ($types) $stmt->bind_param($types, ...$params);
-$stmt->execute();
-$items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$items = $stmt->fetchAll();
 
 // Stats
-$totalKatalog = $koneksi->query("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE jumlah_terkumpul < target_butuh AND (aktif=1 OR status_aktif=1)")->fetch_assoc()['n'];
-$totalYayasan = $koneksi->query("SELECT COUNT(*) AS n FROM users WHERE role='penerima' AND status_verifikasi='verified'")->fetch_assoc()['n'];
-$totalSelesai = $koneksi->query("SELECT COUNT(*) AS n FROM donasi WHERE status_donasi='selesai'")->fetch_assoc()['n'];
-$koneksi->close();
+$totalKatalog = $pdo->query("SELECT COUNT(*) AS n FROM katalog_kebutuhan WHERE jumlah_terkumpul < target_butuh AND (aktif=1 OR status_aktif=1)")->fetch()['n'];
+$totalYayasan = $pdo->query("SELECT COUNT(*) AS n FROM users WHERE role='penerima' AND status_verifikasi='verified'")->fetch()['n'];
+$totalSelesai = $pdo->query("SELECT COUNT(*) AS n FROM donasi WHERE status_donasi='selesai'")->fetch()['n'];
+$pdo = null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -376,7 +366,7 @@ $koneksi->close();
   </div>
 </div>
 <?php elseif (!$logged_in): ?>
-<!-- Login prompt modal -->
+
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3>Login Diperlukan</h3>

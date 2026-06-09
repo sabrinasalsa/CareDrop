@@ -1,15 +1,24 @@
 <?php
-ob_start(); ini_set('display_errors',0); error_reporting(0);
-session_start(); require_once __DIR__.'/koneksi.php'; ob_end_clean();
+/**
+ * CareDrop – backend/detail_donasi.php
+ * Endpoint JSON: detail donasi berdasarkan ID (PDO)
+ */
+session_start();
+require_once __DIR__ . '/session_config.php';
+require_once __DIR__ . '/koneksi.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isset($_SESSION['id'])) { echo json_encode(['ok'=>false,'error'=>'Belum login']); exit; }
+if (!isset($_SESSION['id'])) { json_error('Belum login', 401); }
 
-$donasi_id = htmlspecialchars(trim($_GET['id'] ?? ''));
-if (empty($donasi_id)) { echo json_encode(['ok'=>false,'error'=>'ID tidak valid']); exit; }
+$donasi_id = trim($_GET['id'] ?? '');
+if (empty($donasi_id)) { json_error('ID tidak valid'); }
+
+// Sanitasi ID (hanya karakter aman)
+$donasi_id = preg_replace('/[^A-Za-z0-9\-]/', '', $donasi_id);
 
 try {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT
             d.id AS donasi_id, d.qty_donasi, d.status_donasi AS status,
             d.deskripsi_kondisi, d.foto_barang, d.created_at,
@@ -27,14 +36,14 @@ try {
          WHERE d.id = ?
          LIMIT 1"
     );
-    $stmt->bind_param("s", $donasi_id);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    $koneksi->close();
+    $stmt->execute([$donasi_id]);
+    $row = $stmt->fetch();
+    $pdo = null;
 
-    if (!$row) { echo json_encode(['ok'=>false,'error'=>'Donasi tidak ditemukan']); exit; }
-    echo json_encode(['ok'=>true,'data'=>$row], JSON_UNESCAPED_UNICODE);
-} catch(Throwable $e) {
-    echo json_encode(['ok'=>false,'error'=>$e->getMessage()]);
+    if (!$row) { json_error('Donasi tidak ditemukan'); }
+    echo json_encode(['ok' => true, 'data' => $row], JSON_UNESCAPED_UNICODE);
+
+} catch (PDOException $e) {
+    $pdo = null;
+    json_error('Server error', 500);
 }

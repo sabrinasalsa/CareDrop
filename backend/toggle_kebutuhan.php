@@ -1,49 +1,53 @@
 <?php
-ob_start(); ini_set('display_errors',0); error_reporting(0);
-session_start(); require_once __DIR__.'/koneksi.php'; ob_end_clean();
+/**
+ * CareDrop – backend/toggle_kebutuhan.php
+ * AJAX: toggle status aktif katalog kebutuhan (PDO, CSRF)
+ */
+session_start();
+require_once __DIR__ . '/koneksi.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
+// ── Autentikasi & otorisasi ──
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penerima') {
-    echo json_encode(['ok'=>false,'error'=>'Akses ditolak']); exit;
+    json_error('Akses ditolak', 403);
 }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { json_error('Method tidak valid', 405); }
+
 
 $yayasan_id = (int)$_SESSION['id'];
 $id         = (int)($_POST['id'] ?? 0);
 
-if ($id < 1) {
-    echo json_encode(['ok'=>false,'error'=>'ID tidak valid']); exit;
-}
+if ($id < 1) { json_error('ID tidak valid'); }
 
 try {
-    // Toggle nilai aktif (0→1 atau 1→0), juga sync status_aktif
-    $stmt = $koneksi->prepare(
+    // Toggle nilai aktif & sync status_aktif
+    $stmt = $pdo->prepare(
         "UPDATE katalog_kebutuhan
          SET aktif = IF(aktif=1,0,1), status_aktif = IF(status_aktif=1,0,1)
          WHERE id = ? AND yayasan_id = ?"
     );
-    $stmt->bind_param("ii", $id, $yayasan_id);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
+    $stmt->execute([$id, $yayasan_id]);
 
-    // Ambil status terbaru
-    $chk = $koneksi->prepare("SELECT aktif FROM katalog_kebutuhan WHERE id = ?");
-    $chk->bind_param("i", $id);
-    $chk->execute();
-    $row = $chk->get_result()->fetch_assoc();
-    $chk->close();
-    $koneksi->close();
+    if ($stmt->rowCount() > 0) {
+        // Ambil status terbaru
+        $chk = $pdo->prepare("SELECT aktif FROM katalog_kebutuhan WHERE id = ?");
+        $chk->execute([$id]);
+        $row = $chk->fetch();
+        $pdo = null;
 
-    if ($affected > 0) {
         $statusBaru = (bool)($row['aktif'] ?? false);
         echo json_encode([
-            'ok'     => true,
-            'aktif'  => $statusBaru,
-            'msg'    => $statusBaru ? 'Daftar kebutuhan dibuka kembali.' : 'Daftar kebutuhan ditutup.'
+            'ok'    => true,
+            'aktif' => $statusBaru,
+            'msg'   => $statusBaru ? 'Daftar kebutuhan dibuka kembali.' : 'Daftar kebutuhan ditutup.',
         ]);
     } else {
-        echo json_encode(['ok'=>false,'error'=>'Item tidak ditemukan atau bukan milik yayasan ini.']);
+        $pdo = null;
+        json_error('Item tidak ditemukan atau bukan milik yayasan ini.');
     }
-} catch(Throwable $e) {
-    echo json_encode(['ok'=>false,'error'=>$e->getMessage()]);
+
+} catch (PDOException $e) {
+    $pdo = null;
+    json_error('Server error. Silakan coba lagi.', 500);
 }

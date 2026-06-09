@@ -14,7 +14,7 @@ if (empty($donasi_id)) { header('Location: dashboard.php?tab=sertifikat'); exit;
 $user_id = (int)$_SESSION['id'];
 
 // Ambil data donasi + barang + yayasan
-$stmt = $koneksi->prepare(
+$stmt = $pdo->prepare(
     "SELECT d.id AS donasi_id, d.qty_donasi, d.updated_at AS tgl_selesai, d.status_donasi,
             d.donatur_id,
             COALESCE(k.nama_barang, '—') AS nama_barang,
@@ -29,11 +29,9 @@ $stmt = $koneksi->prepare(
      WHERE d.id = ? AND d.donatur_id = ? AND d.status_donasi = 'selesai'
      LIMIT 1"
 );
-$stmt->bind_param("si", $donasi_id, $user_id);
-$stmt->execute();
-$data = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-$koneksi->close();
+$stmt->execute([$donasi_id, $user_id]);
+$data = $stmt->fetch();
+$pdo  = null;
 
 if (!$data) {
     // Coba cek tanpa filter donatur (untuk admin) atau tampilkan error

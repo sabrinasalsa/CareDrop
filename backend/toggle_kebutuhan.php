@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/toggle_kebutuhan.php
- * AJAX: toggle status aktif katalog kebutuhan (PDO, CSRF)
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

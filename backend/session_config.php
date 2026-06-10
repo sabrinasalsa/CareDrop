@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – session_config.php
- * Konfigurasi session: timeout 2 jam, httponly, samesite strict
- */
+
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.gc_maxlifetime',   7200);  // 2 jam
     ini_set('session.cookie_httponly',  1);

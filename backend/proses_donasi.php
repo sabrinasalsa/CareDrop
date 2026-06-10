@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/proses_donasi.php
- * Endpoint AJAX tawaran donasi: PDO, CSRF, role donatur, validasi lengkap
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

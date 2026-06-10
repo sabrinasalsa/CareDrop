@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/upload_legalitas.php
- * Upload berkas legalitas yayasan: PDO, CSRF, validasi MIME type nyata
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

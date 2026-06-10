@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/lacak_resi.php
- * Endpoint JSON: lacak status pengiriman berdasarkan nomor resi (PDO)
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

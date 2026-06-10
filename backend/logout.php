@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/logout.php
- * Logout: hancurkan session + hapus cookie session
- */
+
 require_once __DIR__ . '/session_config.php';
 
 // Hapus semua variabel session

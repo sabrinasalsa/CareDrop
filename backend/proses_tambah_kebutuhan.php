@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/proses_tambah_kebutuhan.php
- * Tambah item katalog kebutuhan (form HTML yayasan)
- * PDO, CSRF, role penerima, validasi server-side
- */
+
 ob_start();
 
 require_once __DIR__ . '/koneksi.php';

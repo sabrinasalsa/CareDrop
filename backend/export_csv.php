@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/export_csv.php
- * Export riwayat donasi ke CSV: PDO, session_config, role check
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

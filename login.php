@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-
 $tab   = $_GET['tab']   ?? 'login';
 $role  = $_GET['role']  ?? 'donatur';
 $flash = $_GET['flash'] ?? '';
@@ -9,6 +8,22 @@ $flash = $_GET['flash'] ?? '';
 if (isset($_SESSION['id'])) {
     header('Location: index.php');
     exit;
+}
+
+// ── Ambil data lama & pesan error dari session (jika ada) ──
+$reg_old   = $_SESSION['reg_old']   ?? [];
+$reg_error = $_SESSION['reg_error'] ?? '';
+unset($_SESSION['reg_old'], $_SESSION['reg_error']);
+
+// Jika ada data lama, paksa buka tab register
+if (!empty($reg_old)) {
+    $tab = 'register';
+}
+
+// Helper: ambil nilai lama dengan aman
+function old(string $key, string $default = ''): string {
+    global $reg_old;
+    return htmlspecialchars($reg_old[$key] ?? $default, ENT_QUOTES, 'UTF-8');
 }
 ?>
 <!DOCTYPE html>
@@ -452,20 +467,31 @@ if (isset($_SESSION['id'])) {
       <h1 class="form-title">Buat <em>Akun</em> Baru</h1>
       <p class="form-sub">Gratis selamanya. Mulai berdonasi atau terima donasi hari ini.</p>
 
+      <?php if ($reg_error): ?>
+      <div class="flash flash-err" style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+        <img src="https://img.icons8.com/fluency/32/high-priority.png" alt="" style="width:18px;height:18px;flex-shrink:0">
+        <span><?= htmlspecialchars($reg_error, ENT_QUOTES, 'UTF-8') ?></span>
+      </div>
+      <?php endif; ?>
+
       <form action="backend/proses_registrasi.php" method="POST" id="registerForm" novalidate>
 
         <!-- Role picker -->
+        <?php
+          // Prioritaskan role dari data lama session, lalu dari $_GET
+          $selectedRole = old('role') ?: ($role !== 'penerima' ? 'donatur' : 'penerima');
+        ?>
         <div class="role-pick">
           <label class="role-opt">
             <input type="radio" name="role" value="donatur"
-                   <?= $role !== 'penerima' ? 'checked' : '' ?>>
+                   <?= $selectedRole !== 'penerima' ? 'checked' : '' ?>>
             <span class="ro-icon"><img src="uploads/icon/home.png" alt="Donatur"></span>
             <span class="ro-label">Donatur</span>
             <span class="ro-desc">Saya ingin berdonasi</span>
           </label>
           <label class="role-opt">
             <input type="radio" name="role" value="penerima"
-                   <?= $role === 'penerima' ? 'checked' : '' ?>>
+                   <?= $selectedRole === 'penerima' ? 'checked' : '' ?>>
             <span class="ro-icon"><img src="uploads/icon/handshake.png" alt="Yayasan"></span>
             <span class="ro-label">Yayasan</span>
             <span class="ro-desc">Kami menerima donasi</span>
@@ -474,23 +500,27 @@ if (isset($_SESSION['id'])) {
 
         <div class="field">
           <label>Nama Lengkap / Nama Lembaga</label>
-          <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap Anda" required>
+          <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap Anda" required
+                 value="<?= old('nama') ?>">
         </div>
 
         <div class="field-row">
           <div class="field">
             <label>Alamat Email</label>
-            <input type="email" name="email" placeholder="nama@email.com" required autocomplete="email">
+            <input type="email" name="email" placeholder="nama@email.com" required autocomplete="email"
+                   value="<?= old('email') ?>">
           </div>
           <div class="field">
             <label>Nomor Telepon</label>
-            <input type="tel" name="no_telp" placeholder="08xxxxxxxxxx" required>
+            <input type="tel" name="no_telp" placeholder="08xxxxxxxxxx" required
+                   value="<?= old('no_telp') ?>">
           </div>
         </div>
 
         <div class="field">
           <label>Alamat / Kota</label>
-          <input type="text" name="alamat" placeholder="Contoh: Jl. Mawar No.12, Mataram">
+          <input type="text" name="alamat" placeholder="Contoh: Jl. Mawar No.12, Mataram"
+                 value="<?= old('alamat') ?>">
         </div>
 
         <div class="field">

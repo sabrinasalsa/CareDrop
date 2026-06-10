@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/notif_data.php
- * Endpoint JSON: notifikasi per role (PDO, session_config)
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

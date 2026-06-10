@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/proses.donasi.php
- * Proses donasi (versi form HTML): PDO, CSRF, session wajib, validasi input
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/update_profil.php
- * Update profil user: PDO, CSRF, validasi server-side
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

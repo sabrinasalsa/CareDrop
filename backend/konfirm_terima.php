@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/konfirm_terima.php
- * Penerima mengkonfirmasi terima donasi → update status_donasi = 'selesai'
- * PDO, CSRF, role penerima
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

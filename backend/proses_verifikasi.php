@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/proses_verifikasi.php
- * Admin: verifikasi/tolak akun yayasan (penerima)
- * PDO, CSRF, role admin
- */
+
 ob_start();
 
 require_once __DIR__ . '/koneksi.php';

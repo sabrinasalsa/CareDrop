@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/edit_kebutuhan.php
- * AJAX: edit item katalog kebutuhan (yayasan)
- * PDO, CSRF, role penerima, validasi whitelist kategori/urgensi
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

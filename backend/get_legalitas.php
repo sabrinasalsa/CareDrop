@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/get_legalitas.php
- * Endpoint JSON: ambil daftar berkas legalitas milik yayasan (PDO)
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

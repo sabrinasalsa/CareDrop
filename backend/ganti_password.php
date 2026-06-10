@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/ganti_password.php
- * Ganti password: PDO, CSRF, validasi kekuatan password (min 8, ada angka)
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

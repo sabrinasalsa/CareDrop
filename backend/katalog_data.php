@@ -1,8 +1,5 @@
 <?php
-/**
- * CareDrop – backend/katalog_data.php
- * Endpoint JSON publik: ambil semua katalog kebutuhan (PDO)
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

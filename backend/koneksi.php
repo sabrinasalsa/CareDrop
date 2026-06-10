@@ -1,10 +1,5 @@
 <?php
-/**
- * CareDrop – backend/koneksi.php
- * Menyediakan dua koneksi database:
- *  - $pdo     : PDO (digunakan oleh file-file backend PDO)
- *  - $koneksi : MySQLi (digunakan oleh file-file yang memakai MySQLi)
- */
+
 
 $db_host = 'localhost';
 $db_user = 'root';

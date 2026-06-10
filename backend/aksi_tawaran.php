@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/aksi_tawaran.php
- * AJAX: setujui/tolak tawaran (yayasan) & input resi (donatur)
- * PDO, CSRF, role-based access control
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/aksi_katalog.php
- * AJAX: buka/tutup katalog kebutuhan (yayasan)
- * PDO, CSRF, role penerima
- */
+
 session_start();
 require_once __DIR__ . '/koneksi.php';
 

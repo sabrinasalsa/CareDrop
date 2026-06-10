@@ -1,9 +1,5 @@
 <?php
-/**
- * CareDrop – backend/dashboard_data.php
- * Endpoint JSON: data dashboard per role (donatur/penerima/admin)
- * PDO, session_config, multilevel user
- */
+
 session_start();
 require_once __DIR__ . '/session_config.php';
 require_once __DIR__ . '/koneksi.php';

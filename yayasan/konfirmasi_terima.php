@@ -375,7 +375,7 @@ unset($_SESSION['flash']);
                     <div class="card-barang"><?= htmlspecialchars($d['nama_barang']) ?></div>
                     <div class="card-meta">
                         <?php if ($d['status_donasi'] === 'selesai'): ?>
-                            <span class="badge-status badge-success">✓ Selesai</span>
+                            <span class="badge-status badge-success">Selesai</span>
                         <?php else: ?>
                             <span class="badge-status badge-primary">Dalam Pengiriman</span>
                         <?php endif; ?>

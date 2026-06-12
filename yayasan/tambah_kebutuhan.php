@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </header>
 
 <div class="container">
-  <h1>➕ Tambah Kebutuhan Baru</h1>
+  <h1>[+] Tambah Kebutuhan Baru</h1>
   <p class="sub">Yayasan: <strong><?= htmlspecialchars($_SESSION['nama']) ?></strong></p>
 
   <?php if (!empty($errors)): ?>
@@ -178,19 +178,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="urgensi-cards">
           <label class="urg-card red">
             <input type="radio" name="urgensi" value="high" <?= (isset($urgensi) && $urgensi==='high') ? 'checked' : '' ?>>
-            <div class="ico">🔴</div>
+            <div class="ico"><span><img src="uploads/icon/merah.png" alt=""></div>
             <div class="lbl">Urgen</div>
             <div class="desc">Sangat mendesak, dibutuhkan segera</div>
           </label>
           <label class="urg-card yellow">
             <input type="radio" name="urgensi" value="med" <?= (!isset($urgensi) || $urgensi==='med') ? 'checked' : '' ?>>
-            <div class="ico">🟡</div>
+            <div class="ico"><span><img src="uploads/icon/kuning.png" alt=""></div>
             <div class="lbl">Sedang</div>
             <div class="desc">Dibutuhkan dalam waktu dekat</div>
           </label>
           <label class="urg-card">
             <input type="radio" name="urgensi" value="low" <?= (isset($urgensi) && $urgensi==='low') ? 'checked' : '' ?>>
-            <div class="ico">🟢</div>
+            <div class="ico"><span><img src="uploads/icon/ijo.png" alt=""></div>
             <div class="lbl">Normal</div>
             <div class="desc">Tidak terlalu mendesak</div>
           </label>
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
 
       <div class="actions">
-        <button type="submit" class="btn btn-green">✅ Simpan Kebutuhan</button>
+        <button type="submit" class="btn btn-green"><span><img src="uploads/icon/centang.png" alt=""> Simpan Kebutuhan</button>
         <a href="kelola_katalog.php" class="btn btn-ghost">Batal</a>
       </div>
     </form>

@@ -149,7 +149,7 @@ function old(string $key, string $default = ''): string {
       border-radius: 10px;
       padding: 10px 14px;
       font-size: .84rem;
-      color: rgba(201,242,220,.8);
+      color: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(8px);
     }
     .trust-pill img { width: 22px; height: 22px; flex-shrink: 0; }
@@ -395,10 +395,10 @@ function old(string $key, string $default = ''): string {
   </p>
 
   <div class="trust-pills">
-    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/checked-2.png" alt=""> Yayasan terverifikasi admin CareDrop</div>
-    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/in-transit.png" alt=""> Lacak donasi secara real-time</div>
-    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/certificate.png" alt=""> Dapatkan e-sertifikat resmi</div>
-    <div class="trust-pill"><img src="https://img.icons8.com/fluency/48/lock-2.png" alt=""> Data Anda aman & terlindungi</div>
+    <div class="trust-pill"><span><img src="uploads/icon/verified.png" alt=""></span> Yayasan terverifikasi admin CareDrop</div>
+    <div class="trust-pill"><span><img src="uploads/icon/tracking.png" alt=""></span> Lacak donasi secara real-time</div>
+    <div class="trust-pill"><span><img src="uploads/icon/certificate.png" alt=""></span> Dapatkan e-sertifikat resmi</div>
+    <div class="trust-pill"><span><img src="uploads/icon/shield.png" alt=""></span> Data Anda aman & terlindungi</div>
   </div>
 
 </div>
@@ -563,7 +563,7 @@ function old(string $key, string $default = ''): string {
       <p style="text-align:center;font-size:.875rem;color:var(--muted)">
         Sudah punya akun?
         <a href="#" onclick="switchTab('login', document.querySelectorAll('.tab-btn')[0]); return false;"
-           style="color:var(--pine);font-weight:600;text-decoration:none">Masuk di sini →</a>
+           style="color:var(--pine);font-weight:600;text-decoration:none">Masuk di sini -></a>
       </p>
     </div>
 

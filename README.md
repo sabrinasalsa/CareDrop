@@ -203,4 +203,10 @@ kebutuhan_barang -> donasi
 donasi -> pengiriman
 donasi -> sertifikat
 ```
+---
+
+# Bug
+```text
+1. detail dari kebutuhan barang tidak muncul
+2.
 

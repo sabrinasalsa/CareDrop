@@ -220,7 +220,19 @@ unset($_SESSION['flash']);
         .btn-icon:hover { border-color: var(--sage); color: var(--moss); background: #f0fdf4; }
         .btn-icon.danger:hover { border-color: #fca5a5; color: var(--red); background: var(--red-light); }
         .btn-icon.warning:hover { border-color: #fcd34d; color: #d97706; background: #fffbeb; }
+        .btn-icon.view:hover { border-color: #93c5fd; color: #2563eb; background: #eff6ff; }
         .aksi-group { display: flex; gap: 6px; align-items: center; }
+
+        /* DETAIL MODAL */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+        .detail-field { display: flex; flex-direction: column; gap: 4px; }
+        .detail-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .detail-value { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .detail-full { grid-column: 1 / -1; }
+        .detail-desc { font-size: 13px; color: var(--muted); line-height: 1.6; background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+        .detail-progress { grid-column: 1 / -1; }
+        .detail-prog-bar { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-top: 8px; }
+        .detail-prog-fill { background: linear-gradient(90deg, var(--moss), var(--sage)); height: 100%; border-radius: 99px; transition: width 0.4s; }
 
         /* MODAL */
         .modal-overlay {
@@ -298,7 +310,7 @@ unset($_SESSION['flash']);
         <div class="brand-role">Portal Yayasan</div>
     </div>
     <nav class="sidebar-nav">
-        <a href="kelola_katalog.php" class="nav-item active">
+        <a href="dashboard_yayasan.php" class="nav-item">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
             Dashboard
         </a>
@@ -450,7 +462,12 @@ unset($_SESSION['flash']);
                     </td>
                     <td>
                         <div class="aksi-group">
-                            <button class="btn-icon" title="Edit" onclick='openEditModal(<?= json_encode($item) ?>)'>
+                            <button class="btn-icon view btn-detail" title="Lihat Detail"
+                                data-item='<?= json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_TAG) ?>'>
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </button>
+                            <button class="btn-icon btn-edit" title="Edit"
+                                data-item='<?= json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_HEX_TAG) ?>'>
                                 <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
                             </button>
                             <button class="btn-icon warning" title="<?= $item['aktif'] ? 'Tutup' : 'Buka' ?>" onclick="toggleKatalog(<?= $item['id'] ?>, this)">
@@ -528,6 +545,65 @@ unset($_SESSION['flash']);
     </div>
 </div>
 
+<!-- MODAL DETAIL -->
+<div class="modal-overlay" id="modalDetail">
+    <div class="modal" style="max-width:560px">
+        <div class="modal-header">
+            <h2 class="modal-title" id="detail_title">Detail Kebutuhan</h2>
+            <button class="modal-close" onclick="closeModal('modalDetail')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-field">
+                <span class="detail-label">Kategori</span>
+                <span class="detail-value" id="detail_kategori">—</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Urgensi</span>
+                <span class="detail-value" id="detail_urgensi">—</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Target Kebutuhan</span>
+                <span class="detail-value" id="detail_target">—</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Terkumpul</span>
+                <span class="detail-value" id="detail_terkumpul">—</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Status</span>
+                <span class="detail-value" id="detail_status">—</span>
+            </div>
+            <div class="detail-field">
+                <span class="detail-label">Tanggal Dibuat</span>
+                <span class="detail-value" id="detail_tanggal">—</span>
+            </div>
+            <div class="detail-progress">
+                <span class="detail-label">Progress Pemenuhan</span>
+                <div class="detail-prog-bar" style="margin-top:8px">
+                    <div class="detail-prog-fill" id="detail_progbar" style="width:0%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:5px">
+                    <span id="detail_prog_label">0 unit terkumpul</span>
+                    <span id="detail_prog_pct">0%</span>
+                </div>
+            </div>
+            <div class="detail-full detail-field">
+                <span class="detail-label">Deskripsi</span>
+                <div class="detail-desc" id="detail_deskripsi">—</div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn-ghost" onclick="closeModal('modalDetail')">Tutup</button>
+            <button type="button" class="btn-primary" id="detail_edit_btn" onclick="switchToEdit()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                Edit Item
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL EDIT -->
 <div class="modal-overlay" id="modalEdit">
     <div class="modal">
@@ -594,6 +670,82 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
         if (e.target === this) this.classList.remove('open');
     });
 });
+
+// Pasang event listener untuk tombol detail & edit via data-attribute
+document.querySelectorAll('.btn-detail').forEach(btn => {
+    btn.addEventListener('click', function() {
+        try {
+            const data = JSON.parse(this.getAttribute('data-item'));
+            openDetailModal(data);
+        } catch(e) {
+            console.error('Gagal parse data item:', e);
+        }
+    });
+});
+
+document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function() {
+        try {
+            const data = JSON.parse(this.getAttribute('data-item'));
+            openEditModal(data);
+        } catch(e) {
+            console.error('Gagal parse data item:', e);
+        }
+    });
+});
+
+let _currentDetailData = null;
+
+function openDetailModal(data) {
+    _currentDetailData = data;
+    const urgLabel = {high:'Mendesak', med:'Sedang', low:'Normal'};
+    const urgColor = {high:'#dc2626', med:'#d97706', low:'#16a34a'};
+    const urgBg    = {high:'#fef2f2', med:'#fffbeb', low:'#f0fdf4'};
+    const pct = data.target_butuh > 0
+        ? Math.min(100, Math.round((data.jumlah_terkumpul / data.target_butuh) * 100))
+        : 0;
+
+    document.getElementById('detail_title').textContent = data.nama_barang;
+    document.getElementById('detail_kategori').textContent = data.kategori
+        ? data.kategori.charAt(0).toUpperCase() + data.kategori.slice(1) : '—';
+
+    const uEl = document.getElementById('detail_urgensi');
+    const uKey = data.urgensi || 'low';
+    uEl.textContent = urgLabel[uKey] || data.urgensi;
+    uEl.style.cssText = `display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:${urgBg[uKey]};color:${urgColor[uKey]}`;
+
+    document.getElementById('detail_target').textContent = (data.target_butuh || 0) + ' unit';
+    document.getElementById('detail_terkumpul').textContent = (data.jumlah_terkumpul || 0) + ' unit';
+
+    const stEl = document.getElementById('detail_status');
+    if (data.aktif == 1 || data.aktif === true) {
+        stEl.textContent = 'Aktif';
+        stEl.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#f0fdf4;color:#16a34a';
+    } else {
+        stEl.textContent = 'Tutup';
+        stEl.style.cssText = 'display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#f3f4f6;color:#6b7280';
+    }
+
+    if (data.created_at) {
+        const d = new Date(data.created_at);
+        document.getElementById('detail_tanggal').textContent =
+            d.toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+    } else {
+        document.getElementById('detail_tanggal').textContent = '—';
+    }
+
+    document.getElementById('detail_progbar').style.width = pct + '%';
+    document.getElementById('detail_prog_label').textContent = (data.jumlah_terkumpul || 0) + ' unit terkumpul';
+    document.getElementById('detail_prog_pct').textContent = pct + '%';
+    document.getElementById('detail_deskripsi').textContent = data.deskripsi || 'Tidak ada deskripsi.';
+
+    openModal('modalDetail');
+}
+
+function switchToEdit() {
+    closeModal('modalDetail');
+    if (_currentDetailData) openEditModal(_currentDetailData);
+}
 
 function openEditModal(data) {
     document.getElementById('edit_id').value = data.id;

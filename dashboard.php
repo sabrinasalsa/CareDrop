@@ -2,7 +2,7 @@
 session_start();
 if (!isset($_SESSION['id']))          { header('Location: login.php'); exit; }
 if ($_SESSION['role'] === 'admin')    { header('Location: admin/index.php'); exit; }
-if ($_SESSION['role'] === 'penerima') { header('Location: yayasan/kelola_katalog.php'); exit; }
+if ($_SESSION['role'] === 'penerima') { header('Location: yayasan/dashboard_yayasan.php'); exit; }
 
 require_once __DIR__ . '/backend/koneksi.php';
 

@@ -95,8 +95,13 @@ td{padding:11px 14px;font-size:.875rem;vertical-align:middle}
 </head>
 <body>
 <header>
+<<<<<<< HEAD
+  <span class="logo"><img src="../uploads/icon/daun.png" alt="" style="height: 1.2em; vertical-align: middle; margin-top: -3px; margin-right: 6px;"> CareDrop Admin</span>
+  <nav><a href="index.php">← Panel Admin</a><a href="../backend/logout.php">Keluar</a></nav>
+=======
   <span class="logo">🌿 CareDrop Admin</span>
   <nav><a href="index.php" style="display:inline-flex;align-items:center;gap:5px"><img src="https://img.icons8.com/?size=100&id=1806&format=png&color=000000" alt="" style="width:13px;height:13px;filter:invert(1);opacity:.7;"> Kembali ke Dashboard</a><a href="../backend/logout.php">Keluar</a></nav>
+>>>>>>> 45e94e360f9bdf4263b7dfcb517cae0f23e3221d
 </header>
 <div class="wrap">
   <h1>🏷️ Master Data Kategori Barang</h1>

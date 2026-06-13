@@ -1,0 +1,143 @@
+/* CareDrop Admin — Shared Base CSS
+   Include di semua halaman admin setelah Google Fonts */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --forest: #0c2e18; --pine: #1e5630; --moss: #2d7a44; --sage: #4aad6b;
+    --mint: #7ed9a3; --ink: #0b1f12; --muted: #5c7d65;
+    --bg: #f4fbf6; --border: #d4e8db; --white: #ffffff;
+    --red: #dc2626; --red-light: #fef2f2; --red-border: #fecaca;
+    --blue: #2563eb; --blue-light: #eff6ff; --blue-border: #bfdbfe;
+    --amber: #d97706; --amber-light: #fffbeb; --amber-border: #fde68a;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg); color: var(--ink);
+    display: flex; min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+    width: 240px; min-height: 100vh; background: var(--forest);
+    position: fixed; top: 0; left: 0; z-index: 100;
+    display: flex; flex-direction: column;
+}
+.sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.brand-name { font-size: 20px; font-weight: 800; color: var(--mint); letter-spacing: -0.5px; }
+.sidebar-nav { flex: 1; padding: 16px 12px; }
+.nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    color: rgba(255,255,255,0.65); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: all 0.18s; margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.nav-item.active { background: rgba(126,217,163,0.15); color: var(--mint); }
+.nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 0; }
+
+/* ── MAIN ── */
+.main { margin-left: 240px; flex: 1; padding: 32px 36px; min-width: 0; }
+.page-header { margin-bottom: 28px; }
+.page-title { font-size: 26px; font-weight: 800; color: var(--forest); letter-spacing: -0.5px; }
+.page-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+/* ── FLASH ── */
+.flash { padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+.flash-ok  { background: #f0fdf4; color: var(--moss); border: 1px solid #bbf7d0; }
+.flash-err { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+
+/* ── CARD ── */
+.card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(12,46,24,0.05);
+    margin-bottom: 24px;
+}
+.card-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--forest); }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; }
+thead th {
+    padding: 11px 16px; text-align: left;
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    background: #f9fdf9; border-bottom: 1px solid var(--border);
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f9fdf9; }
+tbody td { padding: 12px 16px; font-size: 13px; color: var(--ink); vertical-align: middle; }
+
+/* ── SEARCH ── */
+.search-wrap { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 14px; max-width: 380px;
+}
+.search-box svg { color: var(--muted); flex-shrink: 0; }
+.search-box input {
+    border: none; outline: none; background: transparent;
+    font-family: inherit; font-size: 13px; color: var(--ink); width: 100%;
+}
+
+/* ── TABS ── */
+.tab-bar { display: flex; gap: 4px; padding: 6px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.tab-btn {
+    padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    color: var(--muted); background: none; transition: all 0.15s;
+}
+.tab-btn:hover { background: var(--white); color: var(--ink); }
+.tab-btn.active { background: var(--white); color: var(--forest); box-shadow: 0 1px 4px rgba(12,46,24,0.08); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── BADGES ── */
+.badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.badge-donatur  { background: #f0fdf4; color: var(--moss); }
+.badge-penerima { background: var(--blue-light); color: var(--blue); }
+.badge-admin    { background: #faf5ff; color: #7c3aed; }
+.badge-verified { background: #f0fdf4; color: #16a34a; }
+.badge-pending  { background: var(--amber-light); color: var(--amber); }
+.badge-rejected { background: var(--red-light); color: var(--red); }
+.badge-menunggu  { background: var(--amber-light); color: var(--amber); }
+.badge-disetujui { background: var(--blue-light); color: var(--blue); }
+.badge-dikirim   { background: #f0f9ff; color: #0284c7; }
+.badge-selesai   { background: #f0fdf4; color: #16a34a; }
+.badge-dibatalkan{ background: #f3f4f6; color: #6b7280; }
+.badge-ditolak   { background: var(--red-light); color: var(--red); }
+
+/* ── BUTTONS ── */
+.btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 13px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+}
+.btn-green  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.btn-green:hover  { background: #16a34a; color: #fff; }
+.btn-red    { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+.btn-red:hover    { background: var(--red); color: #fff; }
+.btn-blue   { background: var(--blue-light); color: var(--blue); border: 1px solid var(--blue-border); }
+.btn-blue:hover   { background: var(--blue); color: #fff; }
+.btn-ghost  { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover  { border-color: var(--red-border); color: var(--red); background: var(--red-light); }
+.btn-primary { background: linear-gradient(135deg, var(--moss), var(--sage)); color: #fff; border: none; }
+.btn-primary:hover { opacity: .88; }
+
+/* ── MISC ── */
+.empty-cell { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+.mono { font-family: monospace; font-size: 12px; }
+
+@media (max-width: 1100px) { .main { padding: 20px 16px; } }

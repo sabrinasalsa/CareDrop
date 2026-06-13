@@ -281,6 +281,12 @@ function old(string $key, string $default = ''): string {
     }
     .field input::placeholder { color: #9db8a5; }
 
+    /* Sembunyikan tombol reveal password bawaan browser (Edge/Chrome) */
+    input::-ms-reveal,
+    input::-ms-clear { display: none; }
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
+
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     /* Password toggle */
@@ -443,8 +449,7 @@ function old(string $key, string $default = ''): string {
           <div class="pass-wrap">
             <input type="password" name="password" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
             <button type="button" class="pass-eye" onclick="togglePass('loginPass', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
-              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
-              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+              <img src="https://img.icons8.com/?size=100&id=7jqPGpoNKrdY&format=png&color=000000" alt="toggle" class="pass-eye-img">
             </button>
           </div>
         </div>
@@ -478,7 +483,6 @@ function old(string $key, string $default = ''): string {
 
         <!-- Role picker -->
         <?php
-          // Prioritaskan role dari data lama session, lalu dari $_GET
           $selectedRole = old('role') ?: ($role !== 'penerima' ? 'donatur' : 'penerima');
         ?>
         <div class="role-pick">
@@ -529,8 +533,7 @@ function old(string $key, string $default = ''): string {
             <input type="password" name="password" id="regPass" placeholder="Minimal 6 karakter"
                    required minlength="6" oninput="checkStrength(this.value)">
             <button type="button" class="pass-eye" onclick="togglePass('regPass', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
-              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
-              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+              <img src="https://img.icons8.com/?size=100&id=7jqPGpoNKrdY&format=png&color=000000" alt="toggle" class="pass-eye-img">
             </button>
           </div>
           <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
@@ -542,8 +545,7 @@ function old(string $key, string $default = ''): string {
           <div class="pass-wrap">
             <input type="password" name="password_confirm" id="regPass2" placeholder="Ulangi kata sandi" required>
             <button type="button" class="pass-eye" onclick="togglePass('regPass2', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
-              <img src="https://img.icons8.com/fluency/32/visible.png" alt="show" class="eye-on">
-              <img src="https://img.icons8.com/fluency/32/hide.png" alt="hide" class="eye-off" style="display:none">
+              <img src="https://img.icons8.com/?size=100&id=7jqPGpoNKrdY&format=png&color=000000" alt="toggle" class="pass-eye-img">
             </button>
           </div>
         </div>
@@ -585,18 +587,18 @@ function old(string $key, string $default = ''): string {
     target.classList.add('visible');
   }
 
+  var ICON_SHOW = 'https://img.icons8.com/?size=100&id=eTbZQ8TN9yle&format=png&color=000000';
+  var ICON_HIDE = 'https://img.icons8.com/?size=100&id=7jqPGpoNKrdY&format=png&color=000000';
+
   function togglePass(id, btn) {
     const inp = document.getElementById(id);
-    const on  = btn.querySelector('.eye-on');
-    const off = btn.querySelector('.eye-off');
+    const img = btn.querySelector('.pass-eye-img');
     if (inp.type === 'password') {
       inp.type = 'text';
-      on.style.display  = 'none';
-      off.style.display = 'inline';
+      img.src  = ICON_SHOW;
     } else {
       inp.type = 'password';
-      on.style.display  = 'inline';
-      off.style.display = 'none';
+      img.src  = ICON_HIDE;
     }
   }
   function checkStrength(val) {

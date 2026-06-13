@@ -386,7 +386,7 @@ function old(string $key, string $default = ''): string {
 <body>
 <div class="panel-left">
   <a href="index.php" class="logo">
-    <img src="https://img.icons8.com/fluency/24/leaf.png" alt="" style="width:22px;height:22px">
+    <img src="uploads/icon/daun.png" alt="" style="width:22px;height:22px">
     Care<span>Drop</span>
   </a>
 

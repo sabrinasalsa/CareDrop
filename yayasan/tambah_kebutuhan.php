@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <header>
-  <span class="logo">🌿 CareDrop</span>
+  <span class="logo"><img src="../uploads/icon/daun.png" alt="" style="height: 1.2em; vertical-align: middle; margin-top: -3px; margin-right: 6px;"> CareDrop</span>
   <nav>
     <a href="kelola_katalog.php">← Kembali ke Katalog</a>
     <a href="../backend/logout.php">Keluar</a>

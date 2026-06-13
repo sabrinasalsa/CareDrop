@@ -95,7 +95,7 @@ td{padding:11px 14px;font-size:.875rem;vertical-align:middle}
 </head>
 <body>
 <header>
-  <span class="logo">🌿 CareDrop Admin</span>
+  <span class="logo"><img src="../uploads/icon/daun.png" alt="" style="height: 1.2em; vertical-align: middle; margin-top: -3px; margin-right: 6px;"> CareDrop Admin</span>
   <nav><a href="index.php">← Panel Admin</a><a href="../backend/logout.php">Keluar</a></nav>
 </header>
 <div class="wrap">

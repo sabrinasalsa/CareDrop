@@ -28,7 +28,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
 <body>
 
 <nav class="navbar" id="navbar">
-  <a href="#" class="nav-logo">🌿 Care<span>Drop</span></a>
+  <a href="#" class="nav-logo"><img src="uploads/icon/daun.png" alt="" style="height: 1.2em; vertical-align: middle; margin-top: -3px; margin-right: 6px;"> Care<span>Drop</span></a>
   <div class="nav-links">
     <a href="#tentang">Tentang</a>
     <a href="#cara-kerja">Cara Kerja</a>
@@ -67,6 +67,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
     </a>
     <a href="#cara-kerja" class="btn-hero-ghost">Lihat Cara Kerja</a>
   </div>
+
 
   <div class="hero-wave">
     <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -331,7 +332,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <a href="#" class="nav-logo" style="font-size:1.3rem">🌿 Care<span>Drop</span></a>
+        <a href="#" class="nav-logo" style="font-size:1.3rem"><img src="uploads/icon/daun.png" alt="" style="height: 1.2em; vertical-align: middle; margin-top: -3px; margin-right: 6px;"> Care<span>Drop</span></a>
         <p>Platform donasi barang yang menghubungkan kepedulian dengan kebutuhan nyata. Bersama kita bisa membuat perbedaan yang berarti.</p>
       </div>
       <div class="footer-col">
@@ -348,7 +349,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2025 CareDrop. Dibuat dengan ❤️ untuk Indonesia.</p>
+      <p>&copy; 2026 CareDrop. Dibuat dengan ❤️ untuk Indonesia.</p>
       <p style="font-size:.78rem; color:rgba(201,242,220,.2)">Menghubungkan kepedulian dengan kebutuhan nyata</p>
     </div>
   </div>

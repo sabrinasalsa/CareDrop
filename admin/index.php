@@ -219,7 +219,10 @@ $nama_admin = htmlspecialchars($_SESSION['nama'] ?? 'Admin');
 <aside class="sidebar">
     <div class="sidebar-brand">
         <div class="brand-name">CareDrop</div>
-        <div class="brand-role">Panel Admin</div>
+        <a href="../index.php" class="brand-role" style="display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:rgba(255,255,255,0.45);transition:color .15s;" onmouseover="this.style.color='#7ed9a3'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
+            <img src="https://img.icons8.com/?size=100&id=1806&format=png&color=000000" alt="" style="width:13px;height:13px;filter:invert(1);opacity:.6;">
+            Kembali ke Dashboard
+        </a>
     </div>
     <nav class="sidebar-nav">
         <a href="index.php" class="nav-item active">

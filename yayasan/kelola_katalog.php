@@ -533,7 +533,7 @@ unset($_SESSION['flash']);
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <form action="../backend/edit_kebutuhan.php" method="POST">
+        <form id="formEdit">
             <input type="hidden" name="id" id="edit_id">
             <div class="form-group">
                 <label class="form-label">Nama Barang <span style="color:var(--red)">*</span></label>
@@ -714,9 +714,30 @@ function toggleKatalog(id, btn) {
     .catch(() => showToast('Terjadi kesalahan koneksi', 'error'));
 }
 
-<?php if ($flash): ?>
-showToast(<?= json_encode($flash['msg']) ?>, <?= json_encode($flash['type'] ?? 'success') ?>);
-<?php endif; ?>
+// ── Submit edit via AJAX ──
+document.getElementById('formEdit').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    fetch('../backend/edit_kebutuhan.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                closeModal('modalEdit');
+                showToast(data.msg || 'Kebutuhan berhasil diperbarui.', 'success');
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showToast(data.msg || 'Gagal menyimpan perubahan.', 'error');
+            }
+        })
+        .catch(() => showToast('Terjadi kesalahan koneksi.', 'error'))
+        .finally(() => { btn.disabled = false; });
+});
+
 </script>
+<?php if ($flash): ?>
+<script>showToast(<?= json_encode($flash['msg']) ?>, <?= json_encode($flash['type'] ?? 'success') ?>);</script>
+<?php endif; ?>
 </body>
 </html>

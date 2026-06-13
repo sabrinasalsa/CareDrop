@@ -98,7 +98,7 @@ td{padding:10px 12px;font-size:.855rem}
   <nav><a href="index.php" style="display:inline-flex;align-items:center;gap:5px"><img src="https://img.icons8.com/?size=100&id=1806&format=png&color=000000" alt="" style="width:13px;height:13px;filter:invert(1);opacity:.7;"> Kembali ke Dashboard</a><a href="../backend/logout.php">Keluar</a></nav>
 </header>
 <div class="wrap">
-  <h1>📊 Dashboard Analitik</h1>
+  <h1 style="display:flex;align-items:center;gap:10px"><img src="https://img.icons8.com/?size=100&id=wiTMOrBqVjSm&format=png&color=000000" alt="" style="width:32px;height:32px;"> Dashboard Analitik</h1>
   <p class="sub">Statistik dan tren platform CareDrop</p>
 
   <!-- STAT CARDS -->
@@ -111,11 +111,11 @@ td{padding:10px 12px;font-size:.855rem}
   <!-- CHARTS ROW 1 -->
   <div class="chart-grid">
     <div class="ccard">
-      <h2>📈 Tren Donasi 12 Bulan Terakhir</h2>
+      <h2 style="display:flex;align-items:center;gap:8px"><img src="https://img.icons8.com/?size=100&id=101799&format=png&color=12B886" alt="" style="width:22px;height:22px;"> Tren Donasi 12 Bulan Terakhir</h2>
       <canvas id="chartTren" height="120"></canvas>
     </div>
     <div class="ccard">
-      <h2>🍩 Status Donasi</h2>
+      <h2>Status Donasi</h2>
       <canvas id="chartStatus" height="160"></canvas>
     </div>
   </div>
@@ -123,7 +123,7 @@ td{padding:10px 12px;font-size:.855rem}
   <!-- CHARTS ROW 2 -->
   <div class="chart-grid2">
     <div class="ccard">
-      <h2>🏆 Top 5 Kategori Barang (Selesai)</h2>
+      <h2 style="display:flex;align-items:center;gap:8px"><img src="https://img.icons8.com/?size=100&id=kuU7I7uPlHfo&format=png&color=000000" alt="" style="width:22px;height:22px;"> Top 5 Kategori Barang (Selesai)</h2>
       <table>
         <thead><tr><th>Kategori</th><th>Donasi</th><th>Unit</th></tr></thead>
         <tbody>
@@ -145,7 +145,7 @@ td{padding:10px 12px;font-size:.855rem}
       </table>
     </div>
     <div class="ccard">
-      <h2>🏠 Top 5 Yayasan Penerima</h2>
+      <h2 style="display:flex;align-items:center;gap:8px"><img src="../uploads/icon/handshake.png" alt="" style="width:22px;height:22px;"> Top 5 Yayasan Penerima</h2>
       <table>
         <thead><tr><th>Yayasan</th><th>Donasi</th><th>Unit</th></tr></thead>
         <tbody>

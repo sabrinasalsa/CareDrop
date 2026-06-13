@@ -180,7 +180,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
       Bersama Kita Sudah<br><em style="color:var(--amber)">Berbuat Banyak</em>
     </h2>
     <p class="section-sub light" style="margin:0 auto 52px;" data-aos="fade-up" data-aos-delay="140">
-      Angka-angka ini bukan sekadar statistik — di baliknya ada ribuan anak yang kini sekolah dengan seragam baru, buku pelajaran, dan harapan yang tumbuh.
+      Setiap donasi yang disalurkan melalui CareDrop membantu memenuhi kebutuhan yayasan dan penerima manfaat secara tepat sasaran.
     </p>
   </div>
 </section>

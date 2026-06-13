@@ -80,7 +80,7 @@ switch ($row['role']) {
     case 'admin':
         header('Location: ../admin/index.php'); break;
     case 'penerima':
-        header('Location: ../yayasan/kelola_katalog.php'); break;
+        header('Location: ../yayasan/dashboard_yayasan.php'); break;
     case 'donatur':
     default:
         header('Location: ../dashboard.php'); break;

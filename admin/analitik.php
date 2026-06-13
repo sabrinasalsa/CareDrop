@@ -95,7 +95,7 @@ td{padding:10px 12px;font-size:.855rem}
 <body>
 <header>
   <span class="logo">🌿 CareDrop Admin</span>
-  <nav><a href="index.php">← Panel Admin</a><a href="../backend/logout.php">Keluar</a></nav>
+  <nav><a href="index.php" style="display:inline-flex;align-items:center;gap:5px"><img src="https://img.icons8.com/?size=100&id=1806&format=png&color=000000" alt="" style="width:13px;height:13px;filter:invert(1);opacity:.7;"> Kembali ke Dashboard</a><a href="../backend/logout.php">Keluar</a></nav>
 </header>
 <div class="wrap">
   <h1>📊 Dashboard Analitik</h1>

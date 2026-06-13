@@ -413,7 +413,10 @@ function old(string $key, string $default = ''): string {
 <div class="panel-right">
   <div class="auth-box">
 
-    <a href="index.php" class="back-link">Kembali ke Beranda</a>
+    <a href="index.php" class="back-link">
+      <img src="https://img.icons8.com/?size=100&id=1806&format=png&color=000000" alt="" style="width:16px;height:16px;">
+      Kembali ke Beranda
+    </a>
 
     <?php if ($flash === 'registered'): ?>
       <div class="flash flash-ok" style="display:flex;align-items:center;gap:8px">

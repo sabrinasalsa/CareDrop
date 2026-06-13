@@ -286,7 +286,7 @@ try {
         <div class="card">
             <div class="card-header">
                 <h3>Donasi Terbaru</h3>
-                <a href="tawaran_masuk.php">Lihat semua →</a>
+                <a href="tawaran_masuk.php">Lihat semua</a>
             </div>
             <div style="overflow-x:auto">
                 <table>
@@ -368,7 +368,7 @@ try {
             <div class="card">
                 <div class="card-header">
                     <h3>Kebutuhan Prioritas</h3>
-                    <a href="kelola_katalog.php">Kelola →</a>
+                    <a href="kelola_katalog.php">Kelola</a>
                 </div>
                 <?php if (empty($katalog_list)): ?>
                 <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">

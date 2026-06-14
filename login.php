@@ -10,12 +10,17 @@ if (isset($_SESSION['id'])) {
     exit;
 }
 
-// ── Ambil data lama & pesan error dari session (jika ada) ──
+// ── Ambil pesan error login dari session ──
+$login_error = $_SESSION['login_error'] ?? '';
+$login_email = $_SESSION['login_email'] ?? '';
+unset($_SESSION['login_error'], $_SESSION['login_email']);
+
+// ── Ambil data lama & pesan error dari session (registrasi) ──
 $reg_old   = $_SESSION['reg_old']   ?? [];
 $reg_error = $_SESSION['reg_error'] ?? '';
 unset($_SESSION['reg_old'], $_SESSION['reg_error']);
 
-// Jika ada data lama, paksa buka tab register
+// Jika ada data lama registrasi, buka tab register
 if (!empty($reg_old)) {
     $tab = 'register';
 }
@@ -441,10 +446,18 @@ function old(string $key, string $default = ''): string {
       <h1 class="form-title">Selamat <em>Datang</em></h1>
       <p class="form-sub">Masuk untuk melanjutkan perjalanan donasimu.</p>
 
+      <?php if ($login_error): ?>
+      <div class="flash flash-err" style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;color:#dc2626"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+        <span><?= htmlspecialchars($login_error, ENT_QUOTES, 'UTF-8') ?></span>
+      </div>
+      <?php endif; ?>
+
       <form action="backend/proses_login.php" method="POST" id="loginForm">
         <div class="field">
           <label>Alamat Email</label>
-          <input type="email" name="email" placeholder="nama@email.com" required autocomplete="email">
+          <input type="email" name="email" placeholder="nama@email.com" required autocomplete="email"
+                 value="<?= htmlspecialchars($login_email, ENT_QUOTES, 'UTF-8') ?>">
         </div>
 
         <div class="field">
@@ -645,8 +658,26 @@ function old(string $key, string $default = ''): string {
     const p2 = document.getElementById('regPass2').value;
     if (p1 !== p2) {
       e.preventDefault();
-      alert('Kata sandi dan konfirmasi tidak cocok!');
+      // Tampilkan error inline, bukan alert()
+      let errBox = document.getElementById('reg-pass-err');
+      if (!errBox) {
+        errBox = document.createElement('div');
+        errBox.id = 'reg-pass-err';
+        errBox.className = 'flash flash-err';
+        errBox.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:16px';
+        document.getElementById('regPass').closest('.field').before(errBox);
+      }
+      errBox.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg><span>Kata sandi dan konfirmasi tidak cocok!</span>';
+      document.getElementById('regPass2').focus();
     }
+  });
+
+  // Hilangkan error inline saat user mulai mengetik lagi
+  ['regPass', 'regPass2'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const box = document.getElementById('reg-pass-err');
+      if (box) box.remove();
+    });
   });
 
   document.querySelectorAll('.form-section:not(.visible)').forEach(f => {

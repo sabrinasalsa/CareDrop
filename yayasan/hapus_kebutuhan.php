@@ -15,24 +15,20 @@ if ($id <= 0) {
 
 try {
     // Pastikan item milik yayasan yang login
-    $chk = $koneksi->prepare("SELECT id, nama_barang FROM katalog_kebutuhan WHERE id = ? AND yayasan_id = ?");
-    $chk->bind_param("ii", $id, $yayasan_id);
-    $chk->execute();
-    $item = $chk->get_result()->fetch_assoc();
-    $chk->close();
+    $chk = $pdo->prepare("SELECT id, nama_barang FROM katalog_kebutuhan WHERE id = ? AND yayasan_id = ?");
+    $chk->execute([$id, $yayasan_id]);
+    $item = $chk->fetch(PDO::FETCH_ASSOC);
 
     if (!$item) {
         header('Location: kelola_katalog.php?err=notfound'); exit;
     }
 
     // Cek apakah ada donasi aktif yang terhubung
-    $cekDonasi = $koneksi->prepare(
+    $cekDonasi = $pdo->prepare(
         "SELECT COUNT(*) AS cnt FROM donasi WHERE katalog_id = ? AND status_donasi NOT IN ('selesai','dibatalkan')"
     );
-    $cekDonasi->bind_param("i", $id);
-    $cekDonasi->execute();
-    $aktif = $cekDonasi->get_result()->fetch_assoc();
-    $cekDonasi->close();
+    $cekDonasi->execute([$id]);
+    $aktif = $cekDonasi->fetch(PDO::FETCH_ASSOC);
 
     if ($aktif['cnt'] > 0) {
         // Ada donasi aktif — tidak bisa dihapus
@@ -40,11 +36,9 @@ try {
     }
 
     // Hapus
-    $del = $koneksi->prepare("DELETE FROM katalog_kebutuhan WHERE id = ? AND yayasan_id = ?");
-    $del->bind_param("ii", $id, $yayasan_id);
-    $del->execute();
-    $del->close();
-    $koneksi->close();
+    $del = $pdo->prepare("DELETE FROM katalog_kebutuhan WHERE id = ? AND yayasan_id = ?");
+    $del->execute([$id, $yayasan_id]);
+    $pdo = null;
 
     header('Location: kelola_katalog.php?deleted=1'); exit;
 

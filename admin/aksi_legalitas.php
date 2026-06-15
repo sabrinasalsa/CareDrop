@@ -27,14 +27,12 @@ if (!in_array($aksi, ['terima', 'tolak'], true)) {
 $status = ($aksi === 'terima') ? 'verified' : 'rejected';
 
 try {
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "UPDATE berkas_legalitas SET status = ? WHERE yayasan_id = ? AND jenis = ?"
     );
-    $stmt->bind_param("sis", $status, $yayasan_id, $jenis);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
-    $koneksi->close();
+    $stmt->execute([$status, $yayasan_id, $jenis]);
+    $affected = $stmt->rowCount();
+    $pdo = null;
 
     if ($affected > 0) {
         echo json_encode(['ok' => true, 'status' => $status]);

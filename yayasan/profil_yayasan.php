@@ -9,14 +9,14 @@ $nama_yayasan = htmlspecialchars($_SESSION['nama'] ?? 'Yayasan');
 
 $user = [];
 try {
-    $r = $koneksi->prepare("SELECT nama_lengkap, email, no_telp, alamat, avatar FROM users WHERE id=?");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $user = $r->get_result()->fetch_assoc() ?? []; $r->close();
+    $r = $pdo->prepare("SELECT nama_lengkap, email, no_telp, alamat, avatar FROM users WHERE id=?");
+    $r->execute([$yayasan_id]);
+    $user = $r->fetch(PDO::FETCH_ASSOC) ?: [];
 } catch (Exception $e) {}
 
 $legalitas_map = [];
 try {
-    $koneksi->query("CREATE TABLE IF NOT EXISTS berkas_legalitas (
+    $pdo->query("CREATE TABLE IF NOT EXISTS berkas_legalitas (
         id INT AUTO_INCREMENT PRIMARY KEY,
         yayasan_id INT NOT NULL,
         jenis VARCHAR(50) NOT NULL,
@@ -25,23 +25,22 @@ try {
         status ENUM('pending','verified','rejected') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
-    $r = $koneksi->prepare("SELECT jenis, nama_file, keterangan, status, created_at FROM berkas_legalitas WHERE yayasan_id=?");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    foreach ($r->get_result()->fetch_all(MYSQLI_ASSOC) as $row) {
+    $r = $pdo->prepare("SELECT jenis, nama_file, keterangan, status, created_at FROM berkas_legalitas WHERE yayasan_id=?");
+    $r->execute([$yayasan_id]);
+    foreach ($r->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $legalitas_map[$row['jenis']] = $row;
     }
-    $r->close();
 } catch (Exception $e) {}
 
 $badge_menunggu = $badge_dikirim = 0;
 try {
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d JOIN katalog_kebutuhan k ON k.id=d.katalog_id WHERE k.yayasan_id=? AND d.status_donasi='menunggu'");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $badge_menunggu = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi d JOIN katalog_kebutuhan k ON k.id=d.katalog_id WHERE k.yayasan_id=? AND d.status_donasi='menunggu'");
+    $r->execute([$yayasan_id]);
+    $badge_menunggu = (int)($r->fetch(PDO::FETCH_ASSOC)['n'] ?? 0);
 
-    $r = $koneksi->prepare("SELECT COUNT(*) AS n FROM donasi d JOIN katalog_kebutuhan k ON k.id=d.katalog_id WHERE k.yayasan_id=? AND d.status_donasi='dikirim'");
-    $r->bind_param("i", $yayasan_id); $r->execute();
-    $badge_dikirim = (int)($r->get_result()->fetch_assoc()['n'] ?? 0); $r->close();
+    $r = $pdo->prepare("SELECT COUNT(*) AS n FROM donasi d JOIN katalog_kebutuhan k ON k.id=d.katalog_id WHERE k.yayasan_id=? AND d.status_donasi='dikirim'");
+    $r->execute([$yayasan_id]);
+    $badge_dikirim = (int)($r->fetch(PDO::FETCH_ASSOC)['n'] ?? 0);
 } catch (Exception $e) {}
 
 $jenis_labels = [
@@ -96,7 +95,16 @@ $avatar_url = !empty($user['avatar'])
         .nav-item.active { background: rgba(126,217,163,0.15); color: var(--mint); }
         .nav-item .badge { margin-left: auto; background: var(--amber); color: var(--ink); font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
         .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0; }
-        .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-footer { padding: 14px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-profile { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; transition: background 0.15s; }
+        .sidebar-profile:hover { background: rgba(255,255,255,0.06); }
+        .profile-av { width: 36px; height: 36px; border-radius: 50%; background: var(--moss); border: 2px solid var(--sage); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden; }
+        .profile-av img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info { overflow: hidden; flex: 1; }
+        .profile-info strong { display: block; font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .profile-info span { font-size: 10px; color: rgba(255,255,255,0.4); }
+        .logout-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; color: rgba(255,255,255,0.45); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.15s; margin-top: 4px; }
+        .logout-btn:hover { background: rgba(220,38,38,0.15); color: #f87171; }
 
         /* MAIN */
         .main { margin-left: 240px; flex: 1; padding: 32px 36px; max-width: calc(100vw - 240px); }
@@ -224,7 +232,7 @@ $avatar_url = !empty($user['avatar'])
         <div class="brand-role">Portal Yayasan</div>
     </div>
     <nav class="sidebar-nav">
-        <a href="kelola_katalog.php" class="nav-item">
+        <a href="dashboard_yayasan.php" class="nav-item">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
             Dashboard
         </a>
@@ -257,8 +265,26 @@ $avatar_url = !empty($user['avatar'])
         </a>
     </nav>
     <div class="sidebar-footer">
-        <a href="../backend/logout.php" class="nav-item" style="color:rgba(255,255,255,0.5);">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+        <?php
+            $av = $_SESSION['avatar'] ?? null;
+            $inisial_yayasan = mb_strtoupper(mb_substr($_SESSION['nama'] ?? 'Y', 0, 2));
+            $avPath = $av ? '../uploads/avatars/' . htmlspecialchars($av) : null;
+        ?>
+        <a href="profil_yayasan.php" class="sidebar-profile" style="text-decoration:none">
+            <div class="profile-av">
+                <?php if ($avPath && file_exists(dirname(__DIR__) . '/uploads/avatars/' . $av)): ?>
+                    <img src="<?= $avPath ?>" alt="foto profil">
+                <?php else: ?>
+                    <?= $inisial_yayasan ?>
+                <?php endif; ?>
+            </div>
+            <div class="profile-info">
+                <strong><?= htmlspecialchars(mb_substr($_SESSION['nama'] ?? 'Yayasan', 0, 22)) ?></strong>
+                <span>Yayasan</span>
+            </div>
+        </a>
+        <a href="../backend/logout.php" class="logout-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
             Keluar
         </a>
     </div>

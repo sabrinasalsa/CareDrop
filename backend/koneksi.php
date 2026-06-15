@@ -28,15 +28,4 @@ try {
     die("KONEKSI KE DATABASE GAGAL: " . $e->getMessage());
 }
 
-// ── MySQLi connection ($koneksi) ────────────────────────────────────────────
-$koneksi = new mysqli($db_host, $db_user, $db_pass, $db_name);
-if ($koneksi->connect_error) {
-    if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
-        header('Content-Type: application/json');
-        http_response_code(500);
-        echo json_encode(['error' => 'Database connection failed']);
-        exit;
-    }
-    die("KONEKSI MYSQLI GAGAL: " . $koneksi->connect_error);
-}
-$koneksi->set_charset('utf8mb4');
+

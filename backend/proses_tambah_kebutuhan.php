@@ -1,9 +1,7 @@
 <?php
 
-ob_start();
-
+session_start();
 require_once __DIR__ . '/koneksi.php';
-ob_end_clean();
 
 // ── Autentikasi & otorisasi ──
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penerima') {
@@ -29,16 +27,16 @@ if (!in_array($urgensi,  $allowed_urg, true))  $urgensi  = 'med';
 
 // ── Validasi ──
 if (empty($nama_barang)) {
-    header('Location: ../yayasan/tambah_kebutuhan.php?err=empty_nama'); exit;
+    header('Location: ../yayasan/kelola_katalog.php?err=empty_nama'); exit;
 }
 if (strlen($nama_barang) > 200) {
-    header('Location: ../yayasan/tambah_kebutuhan.php?err=nama_long'); exit;
+    header('Location: ../yayasan/kelola_katalog.php?err=nama_long'); exit;
 }
 if ($target < 1) {
-    header('Location: ../yayasan/tambah_kebutuhan.php?err=target_invalid'); exit;
+    header('Location: ../yayasan/kelola_katalog.php?err=target_invalid'); exit;
 }
 if ($target > 10000) {
-    header('Location: ../yayasan/tambah_kebutuhan.php?err=target_too_large'); exit;
+    header('Location: ../yayasan/kelola_katalog.php?err=target_too_large'); exit;
 }
 
 try {
@@ -53,5 +51,5 @@ try {
 
 } catch (PDOException $e) {
     $pdo = null;
-    header('Location: ../yayasan/tambah_kebutuhan.php?err=' . urlencode('Gagal menyimpan. Silakan coba lagi.')); exit;
+    header('Location: ../yayasan/kelola_katalog.php?err=' . urlencode('Gagal menyimpan. Silakan coba lagi.')); exit;
 }

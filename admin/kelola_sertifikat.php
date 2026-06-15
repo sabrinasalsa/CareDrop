@@ -5,7 +5,7 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location
 
 $activePage = 'sertifikat';
 
-$koneksi->query("CREATE TABLE IF NOT EXISTS templat_sertifikat (
+$pdo->query("CREATE TABLE IF NOT EXISTS templat_sertifikat (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nama VARCHAR(100) NOT NULL,
     warna_utama VARCHAR(10) DEFAULT '#16a34a',
@@ -16,9 +16,9 @@ $koneksi->query("CREATE TABLE IF NOT EXISTS templat_sertifikat (
     aktif TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
-$cnt = $koneksi->query("SELECT COUNT(*) AS n FROM templat_sertifikat")->fetch_assoc()['n'];
+$cnt = $pdo->query("SELECT COUNT(*) AS n FROM templat_sertifikat")->fetch(PDO::FETCH_ASSOC)['n'];
 if ($cnt == 0) {
-    $koneksi->query("INSERT INTO templat_sertifikat (nama,warna_utama,warna_aksen,teks_header,teks_body,aktif) VALUES
+    $pdo->query("INSERT INTO templat_sertifikat (nama,warna_utama,warna_aksen,teks_header,teks_body,aktif) VALUES
         ('Default Hijau','#16a34a','#14532d','SERTIFIKAT DONASI','Telah berhasil mendonasikan barang kepada yayasan sebagai wujud kepedulian terhadap sesama.',1),
         ('Biru Formal','#2563eb','#1e3a8a','CERTIFICATE OF DONATION','Has successfully donated goods to the foundation as a form of care for others.',0)");
 }
@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $act = $_POST['act'] ?? '';
     if ($act === 'aktifkan') {
         $id = (int)$_POST['id'];
-        $koneksi->query("UPDATE templat_sertifikat SET aktif=0");
-        $koneksi->query("UPDATE templat_sertifikat SET aktif=1 WHERE id=$id");
+        $pdo->query("UPDATE templat_sertifikat SET aktif=0");
+        $pdo->query("UPDATE templat_sertifikat SET aktif=1 WHERE id=$id");
         $msg = "Templat berhasil diaktifkan!";
     } elseif ($act === 'simpan') {
         $id     = (int)$_POST['id'];
@@ -38,9 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $aksen  = htmlspecialchars(trim($_POST['warna_aksen']  ?? '#14532d'));
         $header = htmlspecialchars(trim($_POST['teks_header']  ?? ''));
         $body   = htmlspecialchars(trim($_POST['teks_body']    ?? ''));
-        $s = $koneksi->prepare("UPDATE templat_sertifikat SET nama=?,warna_utama=?,warna_aksen=?,teks_header=?,teks_body=? WHERE id=?");
-        $s->bind_param("sssssi", $nama, $warna, $aksen, $header, $body, $id);
-        $s->execute(); $s->close();
+        $s = $pdo->prepare("UPDATE templat_sertifikat SET nama=?,warna_utama=?,warna_aksen=?,teks_header=?,teks_body=? WHERE id=?");
+        $s->execute([$nama, $warna, $aksen, $header, $body, $id]);
         $msg = "Templat berhasil disimpan!";
     } elseif ($act === 'upload_logo') {
         $id = (int)$_POST['id'];
@@ -51,15 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!is_dir($dir)) mkdir($dir, 0755, true);
                 $fname = 'logo_sertif_' . $id . '.' . $ext;
                 move_uploaded_file($_FILES['logo']['tmp_name'], $dir . $fname);
-                $s = $koneksi->prepare("UPDATE templat_sertifikat SET logo_file=? WHERE id=?");
-                $s->bind_param("si", $fname, $id); $s->execute(); $s->close();
+                $s = $pdo->prepare("UPDATE templat_sertifikat SET logo_file=? WHERE id=?");
+                $s->execute([$fname, $id]);
                 $msg = "Logo berhasil diunggah!";
             } else { $err = "Format harus PNG, JPG, atau SVG."; }
         } else { $err = "Pilih file terlebih dahulu."; }
     }
 }
-$templats = $koneksi->query("SELECT * FROM templat_sertifikat ORDER BY aktif DESC, id")->fetch_all(MYSQLI_ASSOC);
-$koneksi->close();
+$templats = $pdo->query("SELECT * FROM templat_sertifikat ORDER BY aktif DESC, id")->fetchAll(PDO::FETCH_ASSOC);
+$pdo = null;
 ?>
 <!DOCTYPE html>
 <html lang="id">

@@ -1,8 +1,4 @@
 <?php
-/**
- * CareDrop – sertifikat.php
- * Halaman E-Sertifikat donasi yang telah selesai
- */
 session_start();
 if (!isset($_SESSION['id'])) { header('Location: login.php'); exit; }
 

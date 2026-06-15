@@ -4,7 +4,7 @@ require_once dirname(__DIR__) . '/backend/koneksi.php';
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location: ../index.php'); exit; }
 
 // Buat tabel jika belum ada
-$koneksi->query("CREATE TABLE IF NOT EXISTS master_kategori (
+$pdo->query("CREATE TABLE IF NOT EXISTS master_kategori (
     id INT AUTO_INCREMENT PRIMARY KEY,
     kode VARCHAR(30) NOT NULL UNIQUE,
     nama VARCHAR(100) NOT NULL,
@@ -13,9 +13,9 @@ $koneksi->query("CREATE TABLE IF NOT EXISTS master_kategori (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 // Seed default jika kosong
-$cnt = $koneksi->query("SELECT COUNT(*) AS n FROM master_kategori")->fetch_assoc()['n'];
+$cnt = $pdo->query("SELECT COUNT(*) AS n FROM master_kategori")->fetch(PDO::FETCH_ASSOC)['n'];
 if ($cnt == 0) {
-    $koneksi->query("INSERT INTO master_kategori (kode,nama,icon) VALUES
+    $pdo->query("INSERT INTO master_kategori (kode,nama,icon) VALUES
         ('pakaian','Pakaian & Sandang','👕'),
         ('buku','Buku & Alat Tulis','📚'),
         ('elektronik','Elektronik','💻'),
@@ -34,24 +34,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $icon = htmlspecialchars(trim($_POST['icon'] ?? '📦'));
         if ($kode && $nama) {
             try {
-                $s = $koneksi->prepare("INSERT INTO master_kategori (kode,nama,icon) VALUES (?,?,?)");
-                $s->bind_param("sss",$kode,$nama,$icon); $s->execute(); $s->close();
+                $s = $pdo->prepare("INSERT INTO master_kategori (kode,nama,icon) VALUES (?,?,?)");
+                $s->execute([$kode, $nama, $icon]);
                 $msg = "Kategori \"$nama\" berhasil ditambahkan!";
             } catch(Throwable $e) { $err = "Gagal: " . $e->getMessage(); }
         } else { $err = "Kode dan nama wajib diisi"; }
     } elseif ($act === 'toggle') {
         $id = (int)$_POST['id'];
-        $koneksi->query("UPDATE master_kategori SET aktif = NOT aktif WHERE id=$id");
+        $pdo->query("UPDATE master_kategori SET aktif = NOT aktif WHERE id=$id");
         $msg = "Status kategori diperbarui";
     } elseif ($act === 'hapus') {
         $id = (int)$_POST['id'];
-        $koneksi->query("DELETE FROM master_kategori WHERE id=$id");
+        $pdo->query("DELETE FROM master_kategori WHERE id=$id");
         $msg = "Kategori dihapus";
     }
 }
 
-$kategori = $koneksi->query("SELECT * FROM master_kategori ORDER BY id")->fetch_all(MYSQLI_ASSOC);
-$koneksi->close();
+$kategori = $pdo->query("SELECT * FROM master_kategori ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+$pdo = null;
 $activePage = 'kategori';
 ?>
 <!DOCTYPE html>
@@ -91,7 +91,7 @@ $activePage = 'kategori';
 
     <!-- Form tambah -->
     <div class="form-card">
-        <h2>➕ Tambah Kategori Baru</h2>
+        <h2>+ Tambah Kategori Baru</h2>
         <form method="POST">
             <input type="hidden" name="act" value="tambah">
             <div class="form-row">
@@ -103,10 +103,7 @@ $activePage = 'kategori';
                     <label>Nama Kategori</label>
                     <input name="nama" placeholder="Mainan Anak" required style="width:220px">
                 </div>
-                <div class="field">
-                    <label>Icon Emoji</label>
-                    <input name="icon" placeholder="🧸" value="📦" style="width:70px;text-align:center">
-                </div>
+
                 <button type="submit" class="btn-submit">+ Tambah</button>
             </div>
         </form>
@@ -115,16 +112,15 @@ $activePage = 'kategori';
     <!-- Tabel kategori -->
     <div class="card">
         <div class="card-header">
-            <span class="card-title">📋 Daftar Kategori (<?= count($kategori) ?>)</span>
+            <span class="card-title">Daftar Kategori (<?= count($kategori) ?>)</span>
         </div>
         <table>
             <thead>
-                <tr><th>Icon</th><th>Kode</th><th>Nama</th><th>Status</th><th>Aksi</th></tr>
+                <tr><th>Kode</th><th>Nama</th><th>Status</th><th>Aksi</th></tr>
             </thead>
             <tbody>
                 <?php foreach($kategori as $k): ?>
                 <tr>
-                    <td style="font-size:1.4rem"><?= htmlspecialchars($k['icon']) ?></td>
                     <td><code><?= htmlspecialchars($k['kode']) ?></code></td>
                     <td><strong><?= htmlspecialchars($k['nama']) ?></strong></td>
                     <td><span class="<?= $k['aktif'] ? 'badge-on' : 'badge-off' ?>"><?= $k['aktif'] ? 'Aktif' : 'Nonaktif' ?></span></td>
@@ -138,14 +134,14 @@ $activePage = 'kategori';
                             <form method="POST" style="display:inline" onsubmit="return confirm('Hapus kategori ini?')">
                                 <input type="hidden" name="act" value="hapus">
                                 <input type="hidden" name="id" value="<?= $k['id'] ?>">
-                                <button class="btn btn-red">🗑 Hapus</button>
+                                <button class="btn btn-red">Hapus</button>
                             </form>
                         </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
                 <?php if(empty($kategori)): ?>
-                <tr><td colspan="5" class="empty-cell">Belum ada kategori.</td></tr>
+                <tr><td colspan="4" class="empty-cell">Belum ada kategori.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

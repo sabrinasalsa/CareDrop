@@ -24,25 +24,21 @@ try {
     }
 
     $newStatus = $statusMap[$aksi];
-    $stmt = $koneksi->prepare("UPDATE donasi SET status_donasi=? WHERE id=?");
-    $stmt->bind_param("ss", $newStatus, $id);
-    $stmt->execute();
-    $stmt->close();
+    $stmt = $pdo->prepare("UPDATE donasi SET status_donasi=? WHERE id=?");
+    $stmt->execute([$newStatus, $id]);
 
     // Jika selesai, update jumlah_terkumpul
     if ($newStatus === 'selesai') {
-        $upd = $koneksi->prepare(
+        $upd = $pdo->prepare(
             "UPDATE katalog_kebutuhan k
              JOIN donasi d ON d.katalog_id = k.id
              SET k.jumlah_terkumpul = k.jumlah_terkumpul + d.qty_donasi
              WHERE d.id = ?"
         );
-        $upd->bind_param("s", $id);
-        $upd->execute();
-        $upd->close();
+        $upd->execute([$id]);
     }
 
-    $koneksi->close();
+    $pdo = null;
     header('Location: index.php?msg=Status+donasi+berhasil+diubah');
 } catch (Throwable $e) {
     header('Location: index.php?err=' . urlencode($e->getMessage()));

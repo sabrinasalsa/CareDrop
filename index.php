@@ -355,9 +355,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
   </div>
 </footer>
 
-<!-- External Scripts -->
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
-<!-- Custom Script -->
 <script src="Assets/js/app.js"></script>
 </html>

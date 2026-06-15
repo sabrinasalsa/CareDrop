@@ -3,7 +3,7 @@ session_start();
 require_once dirname(__DIR__) . '/backend/koneksi.php';
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location: ../index.php'); exit; }
 
-$donasi = $koneksi->query(
+$donasi = $pdo->query(
     "SELECT d.id, d.qty_donasi, d.status_donasi, d.created_at,
             COALESCE(k.nama_barang,'—') AS barang,
             COALESCE(ud.nama_lengkap,'—') AS donatur,
@@ -13,9 +13,9 @@ $donasi = $koneksi->query(
      LEFT JOIN users ud ON ud.id=d.donatur_id
      LEFT JOIN users up ON up.id=k.yayasan_id
      ORDER BY d.created_at DESC"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
-$koneksi->close();
+$pdo = null;
 $activePage = 'donasi';
 
 $total     = count($donasi);

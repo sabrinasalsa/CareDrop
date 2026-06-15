@@ -16,7 +16,6 @@ $user_id    = (int)$_SESSION['id'];
 $jenis      = trim($_POST['jenis']      ?? '');
 $keterangan = htmlspecialchars(trim($_POST['keterangan'] ?? ''), ENT_QUOTES, 'UTF-8');
 
-// ── Whitelist jenis dokumen ──
 $allowedJenis = ['akta', 'sk_kemenkumham', 'npwp', 'foto_gedung', 'lainnya'];
 if (!in_array($jenis, $allowedJenis, true)) {
     json_error('Jenis dokumen tidak valid');

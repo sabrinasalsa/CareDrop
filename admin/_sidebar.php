@@ -1,9 +1,4 @@
 <?php
-/**
- * _sidebar.php — Shared sidebar untuk semua halaman admin.
- * Cara pakai: <?php $activePage = 'dashboard'; require '_sidebar.php'; ?>
- * $activePage: 'dashboard' | 'user' | 'verifikasi' | 'donasi' | 'analitik' | 'kategori' | 'sertifikat'
- */
 $activePage = $activePage ?? '';
 $nama_admin = htmlspecialchars($_SESSION['nama'] ?? 'Admin');
 

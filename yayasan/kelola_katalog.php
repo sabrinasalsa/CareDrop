@@ -102,7 +102,16 @@ unset($_SESSION['flash']);
             font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 20px;
         }
         .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0; }
-        .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-footer { padding: 14px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-profile { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; transition: background 0.15s; }
+        .sidebar-profile:hover { background: rgba(255,255,255,0.06); }
+        .profile-av { width: 36px; height: 36px; border-radius: 50%; background: var(--moss); border: 2px solid var(--sage); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; overflow: hidden; }
+        .profile-av img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info { overflow: hidden; flex: 1; }
+        .profile-info strong { display: block; font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .profile-info span { font-size: 10px; color: rgba(255,255,255,0.4); }
+        .logout-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; color: rgba(255,255,255,0.45); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.15s; margin-top: 4px; }
+        .logout-btn:hover { background: rgba(220,38,38,0.15); color: #f87171; }
 
         /* MAIN */
         .main { margin-left: 240px; flex: 1; min-height: 100vh; padding: 32px 36px; }
@@ -308,8 +317,26 @@ unset($_SESSION['flash']);
         </a>
     </nav>
     <div class="sidebar-footer">
-        <a href="../backend/logout.php" class="nav-item" style="color:rgba(255,255,255,0.5);">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+        <?php
+            $av = $_SESSION['avatar'] ?? null;
+            $inisial_yayasan = mb_strtoupper(mb_substr($_SESSION['nama'] ?? 'Y', 0, 2));
+            $avPath = $av ? '../uploads/avatars/' . htmlspecialchars($av) : null;
+        ?>
+        <a href="profil_yayasan.php" class="sidebar-profile" style="text-decoration:none">
+            <div class="profile-av">
+                <?php if ($avPath && file_exists(dirname(__DIR__) . '/uploads/avatars/' . $av)): ?>
+                    <img src="<?= $avPath ?>" alt="foto profil">
+                <?php else: ?>
+                    <?= $inisial_yayasan ?>
+                <?php endif; ?>
+            </div>
+            <div class="profile-info">
+                <strong><?= htmlspecialchars(mb_substr($_SESSION['nama'] ?? 'Yayasan', 0, 22)) ?></strong>
+                <span>Yayasan</span>
+            </div>
+        </a>
+        <a href="../backend/logout.php" class="logout-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
             Keluar
         </a>
     </div>

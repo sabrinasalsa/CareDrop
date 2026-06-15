@@ -3,14 +3,13 @@ session_start();
 require_once dirname(__DIR__) . '/backend/koneksi.php';
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location: ../index.php'); exit; }
 
-// Semua yayasan (role=penerima)
-$yayasans = $koneksi->query(
+$yayasans = $pdo->query(
     "SELECT id, nama_lengkap, email, no_telp, alamat, status_verifikasi, created_at
      FROM users WHERE role = 'penerima' ORDER BY
      FIELD(status_verifikasi,'pending','rejected','verified'), created_at DESC"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
-$koneksi->close();
+$pdo = null;
 $activePage = 'verifikasi';
 
 $totalPending  = count(array_filter($yayasans, fn($y) => $y['status_verifikasi'] === 'pending'));

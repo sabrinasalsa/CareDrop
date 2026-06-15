@@ -4,14 +4,14 @@ require_once dirname(__DIR__) . '/backend/koneksi.php';
 if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location: ../index.php'); exit; }
 
 // Semua user non-admin
-$users = $koneksi->query(
+$users = $pdo->query(
     "SELECT id, nama_lengkap, email, role,
             COALESCE(status_verifikasi,'—') AS status_verifikasi,
             COALESCE(no_telp,'—') AS no_telp, created_at
      FROM users ORDER BY created_at DESC"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
-$koneksi->close();
+$pdo = null;
 $activePage = 'user';
 ?>
 <!DOCTYPE html>

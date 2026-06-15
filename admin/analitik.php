@@ -6,41 +6,41 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'admin') { header('Location
 $activePage = 'analitik';
 
 // Donasi per bulan (12 bulan terakhir)
-$donasiPerBulan = $koneksi->query(
+$donasiPerBulan = $pdo->query(
     "SELECT DATE_FORMAT(created_at,'%Y-%m') AS bln, COUNT(*) AS total, SUM(qty_donasi) AS qty
      FROM donasi WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
      GROUP BY bln ORDER BY bln"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // Donasi per status
-$donasiStatus = $koneksi->query(
+$donasiStatus = $pdo->query(
     "SELECT status_donasi, COUNT(*) AS total FROM donasi GROUP BY status_donasi"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // Top 5 kategori terbanyak didonasikan
-$topKategori = $koneksi->query(
+$topKategori = $pdo->query(
     "SELECT COALESCE(k.kategori,'lainnya') AS kategori, COUNT(*) AS total, SUM(d.qty_donasi) AS qty
      FROM donasi d LEFT JOIN katalog_kebutuhan k ON k.id=d.katalog_id
      WHERE d.status_donasi='selesai'
      GROUP BY kategori ORDER BY total DESC LIMIT 5"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // Top 5 yayasan penerima
-$topYayasan = $koneksi->query(
+$topYayasan = $pdo->query(
     "SELECT u.nama_lengkap, COUNT(d.id) AS total, SUM(d.qty_donasi) AS qty
      FROM donasi d
      JOIN katalog_kebutuhan k ON k.id=d.katalog_id
      JOIN users u ON u.id=k.yayasan_id
      WHERE d.status_donasi='selesai'
      GROUP BY u.id ORDER BY total DESC LIMIT 5"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // Registrasi user per bulan
-$regPerBulan = $koneksi->query(
+$regPerBulan = $pdo->query(
     "SELECT DATE_FORMAT(created_at,'%Y-%m') AS bln, role, COUNT(*) AS total
      FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
      GROUP BY bln, role ORDER BY bln"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // Summary stats
 $stats = [];
@@ -52,9 +52,9 @@ foreach ([
     'total_yayasan'  => "SELECT COUNT(*) AS n FROM users WHERE role='penerima' AND status_verifikasi='verified'",
     'donasi_bulan'   => "SELECT COUNT(*) AS n FROM donasi WHERE MONTH(created_at)=MONTH(NOW()) AND YEAR(created_at)=YEAR(NOW())",
 ] as $k=>$q) {
-    $stats[$k] = (int)$koneksi->query($q)->fetch_assoc()['n'];
+    $stats[$k] = (int)$pdo->query($q)->fetch(PDO::FETCH_ASSOC)['n'];
 }
-$koneksi->close();
+$pdo = null;
 ?>
 <!DOCTYPE html>
 <html lang="id">

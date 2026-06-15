@@ -8,19 +8,19 @@ $tables = ['donasi','users','katalog_kebutuhan','pengiriman'];
 $result = ['session' => $_SESSION, 'tables' => []];
 
 foreach ($tables as $t) {
-    $res = $koneksi->query("SHOW COLUMNS FROM `$t`");
+    $res = $pdo->query("SHOW COLUMNS FROM `$t`");
     if ($res) {
         $cols = [];
-        while ($r = $res->fetch_assoc()) $cols[] = $r['Field'] . ' (' . $r['Type'] . ')';
+        while ($r = $res->fetch(PDO::FETCH_ASSOC)) $cols[] = $r['Field'] . ' (' . $r['Type'] . ')';
         // Ambil 3 baris contoh data
         $sample = [];
-        $s = $koneksi->query("SELECT * FROM `$t` LIMIT 3");
-        if ($s) while ($r = $s->fetch_assoc()) $sample[] = $r;
+        $s = $pdo->query("SELECT * FROM `$t` LIMIT 3");
+        if ($s) while ($r = $s->fetch(PDO::FETCH_ASSOC)) $sample[] = $r;
         $result['tables'][$t] = ['columns' => $cols, 'sample' => $sample];
     } else {
         $result['tables'][$t] = ['error' => 'Tabel tidak ditemukan'];
     }
 }
 
-$koneksi->close();
+$pdo = null;
 echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

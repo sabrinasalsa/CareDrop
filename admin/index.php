@@ -14,11 +14,11 @@ foreach ([
     'total_donasi'     => "SELECT COUNT(*) AS n FROM donasi",
     'total_barang'     => "SELECT COALESCE(SUM(qty_donasi),0) AS n FROM donasi WHERE status_donasi='selesai'",
 ] as $k => $sql) {
-    $stats[$k] = (int)($koneksi->query($sql)->fetch_assoc()['n'] ?? 0);
+    $stats[$k] = (int)($pdo->query($sql)->fetch(PDO::FETCH_ASSOC)['n'] ?? 0);
 }
 
 // 5 donasi terbaru
-$recentDonasi = $koneksi->query(
+$recentDonasi = $pdo->query(
     "SELECT d.id, d.qty_donasi, d.status_donasi, d.created_at,
             COALESCE(k.nama_barang,'—') AS barang,
             COALESCE(ud.nama_lengkap,'—') AS donatur,
@@ -28,15 +28,15 @@ $recentDonasi = $koneksi->query(
      LEFT JOIN users ud ON ud.id=d.donatur_id
      LEFT JOIN users up ON up.id=k.yayasan_id
      ORDER BY d.created_at DESC LIMIT 5"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
 // 5 user terbaru
-$recentUsers = $koneksi->query(
+$recentUsers = $pdo->query(
     "SELECT nama_lengkap, email, role, status_verifikasi, created_at
      FROM users ORDER BY created_at DESC LIMIT 5"
-)->fetch_all(MYSQLI_ASSOC);
+)->fetchAll(PDO::FETCH_ASSOC);
 
-$koneksi->close();
+$pdo = null;
 $activePage = 'dashboard';
 ?>
 <!DOCTYPE html>
@@ -159,7 +159,7 @@ $activePage = 'dashboard';
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Donasi Terbaru</span>
-                <a href="kelola_donasi.php" class="btn btn-ghost" style="font-size:11px">Lihat semua →</a>
+                <a href="kelola_donasi.php" class="btn btn-ghost" style="font-size:11px">Lihat semua</a>
             </div>
             <table>
                 <thead><tr><th>Barang</th><th>Donatur</th><th>Status</th><th>Tanggal</th></tr></thead>
@@ -187,7 +187,7 @@ $activePage = 'dashboard';
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Pengguna Terbaru</span>
-                <a href="kelola_user.php" class="btn btn-ghost" style="font-size:11px">Lihat semua →</a>
+                <a href="kelola_user.php" class="btn btn-ghost" style="font-size:11px">Lihat semua</a>
             </div>
             <table>
                 <thead><tr><th>Nama</th><th>Role</th><th>Status</th><th>Daftar</th></tr></thead>

@@ -366,7 +366,7 @@ $stMap = [
       Keluar
     </a>
   </nav>
-  <div class="sidebar-user">
+  <a href="?tab=profil" class="sidebar-user" style="text-decoration:none;">
     <div class="user-av"><?php
       $avPath = !empty($_SESSION['avatar']) ? 'uploads/avatars/'.$_SESSION['avatar'] : null;
       if ($avPath && file_exists(__DIR__.'/'.$avPath)): ?>
@@ -377,7 +377,7 @@ $stMap = [
       <strong><?= htmlspecialchars(mb_substr($nama,0,20)) ?></strong>
       <span>Donatur</span>
     </div>
-  </div>
+  </a>
 </aside>
 
 <!-- MAIN -->

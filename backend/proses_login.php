@@ -23,7 +23,7 @@ if (empty($email) || empty($password)) {
 
 // ── Query user via PDO prepared statement ──
 try {
-    $stmt = $pdo->prepare("SELECT id, nama_lengkap, email, password, role, no_telp, alamat, status_verifikasi FROM users WHERE email = ? LIMIT 1");
+    $stmt = $pdo->prepare("SELECT id, nama_lengkap, email, password, role, no_telp, alamat, status_verifikasi, avatar FROM users WHERE email = ? LIMIT 1");
     $stmt->execute([$email]);
     $row = $stmt->fetch();
 } catch (PDOException $e) {
@@ -54,6 +54,7 @@ $_SESSION['role']          = $row['role'];
 $_SESSION['no_telp']       = $row['no_telp']  ?? '';
 $_SESSION['alamat']        = $row['alamat']   ?? '';
 $_SESSION['status_verifikasi'] = $row['status_verifikasi'] ?? '';
+$_SESSION['avatar']        = $row['avatar'] ?? null;
 $_SESSION['last_activity'] = time();
 
 $pdo = null;

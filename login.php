@@ -428,6 +428,11 @@ function old(string $key, string $default = ''): string {
         <img src="https://img.icons8.com/fluency/32/ok.png" alt="" style="width:18px;height:18px;flex-shrink:0">
         Registrasi berhasil! Silakan masuk dengan akun Anda.
       </div>
+    <?php elseif ($flash === 'pending'): ?>
+      <div class="flash" style="display:flex;align-items:flex-start;gap:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:14px 16px;border-radius:10px;margin-bottom:20px">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;color:#d97706"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+        <span><strong>Registrasi berhasil!</strong> Akun yayasan Anda sedang menunggu verifikasi admin. Kami akan menginformasikan melalui email dalam 1–3 hari kerja.</span>
+      </div>
     <?php elseif ($flash === 'timeout'): ?>
       <div class="flash flash-err" style="display:flex;align-items:center;gap:8px">
         <img src="https://img.icons8.com/fluency/32/alarm.png" alt="" style="width:18px;height:18px;flex-shrink:0">

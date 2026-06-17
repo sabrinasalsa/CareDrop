@@ -101,7 +101,7 @@ $selesai      = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 's
                         <th>Qty</th>
                         <th>Status</th>
                         <th>Tanggal</th>
-                        <th>Aksi</th>
+
                     </tr>
                 </thead>
                 <tbody id="tbl-donasi">
@@ -127,24 +127,11 @@ $selesai      = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 's
                         <td><?= (int)$d['qty_donasi'] ?> unit</td>
                         <td><span class="badge <?= $stCls ?>"><?= $stLbl ?></span></td>
                         <td style="color:var(--muted);font-size:12px"><?= date('d M Y', strtotime($d['created_at'])) ?></td>
-                        <td>
-                            <div style="display:flex;gap:6px">
-                                <?php if ($d['status_donasi'] === 'menunggu'): ?>
-                                    <a href="aksi_donasi.php?aksi=proses&id=<?= urlencode($d['id']) ?>" class="btn btn-blue">Proses</a>
-                                    <a href="aksi_donasi.php?aksi=batal&id=<?= urlencode($d['id']) ?>" class="btn btn-red"
-                                       onclick="return confirm('Batalkan donasi ini?')">Batal</a>
-                                <?php elseif ($d['status_donasi'] === 'dikirim'): ?>
-                                    <a href="aksi_donasi.php?aksi=selesai&id=<?= urlencode($d['id']) ?>" class="btn btn-green"
-                                       onclick="return confirm('Tandai donasi ini selesai?')">Selesaikan</a>
-                                <?php else: ?>
-                                    <span style="color:var(--muted);font-size:12px">—</span>
-                                <?php endif; ?>
-                            </div>
-                        </td>
+
                     </tr>
                     <?php endforeach; ?>
                     <?php if (empty($donasi)): ?>
-                    <tr><td colspan="8" class="empty-cell">Belum ada data donasi.</td></tr>
+                    <tr><td colspan="7" class="empty-cell">Belum ada data donasi.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

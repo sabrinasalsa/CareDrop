@@ -86,8 +86,8 @@ $activePage = 'kategori';
         <p class="page-subtitle">Kelola kategori barang yang tersedia di sistem CareDrop.</p>
     </div>
 
-    <?php if($msg): ?><div class="flash flash-ok">✅ <?= htmlspecialchars($msg) ?></div><?php endif; ?>
-    <?php if($err): ?><div class="flash flash-err">❌ <?= htmlspecialchars($err) ?></div><?php endif; ?>
+    <?php if($msg): ?><div class="flash flash-ok"> <?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <?php if($err): ?><div class="flash flash-err"> <?= htmlspecialchars($err) ?></div><?php endif; ?>
 
     <!-- Form tambah -->
     <div class="form-card">

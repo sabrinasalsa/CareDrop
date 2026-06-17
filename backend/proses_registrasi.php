@@ -87,7 +87,7 @@ try {
     unset($_SESSION['reg_old'], $_SESSION['reg_error']);
 
     if ($role === 'penerima') {
-        echo "<script>alert('Registrasi Berhasil! Akun Anda sedang menunggu verifikasi Admin.'); window.location.href='../login.php?flash=registered';</script>";
+        header('Location: ../index.php'); exit;
     } else {
         header('Location: ../login.php?flash=registered'); exit;
     }

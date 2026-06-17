@@ -327,7 +327,7 @@ $avatar_url = !empty($user['avatar'])
                                 </div>
                             <?php endif; ?>
                             <label class="avatar-edit" for="avatarFile" title="Ganti foto">
-                                <i class="ph ph-map-pin" style="font-size: 1.25em; vertical-align: middle;"></i>
+                                <i class="ph ph-camera" style="font-size: 1.25em; vertical-align: middle;"></i>
                             </label>
                             <input type="file" id="avatarFile" class="hidden-file" accept="image/jpg,image/jpeg,image/png,image/webp">
                         </div>

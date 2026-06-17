@@ -401,56 +401,64 @@ Bug Log 1 (Sisa Konflik Git Merusak Tampilan)
 3) Hipotesis penyebab: Kesalahan saat melakukan penggabungan (merge) branch Git sebelumnya, sehingga penanda konflik tertinggal utuh di dalam baris kode PHP.
 4) Fix (apa yang diubah): Menghapus baris kode konflik `<<<<<<< HEAD` dan `=======` yang tertinggal.
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 1](bug/bug1.png)
-
+```text
 Bug Log 2 (Foto Profil Hilang Saat Login)
 1) Gejala: Foto profil pengguna kembali menjadi gambar default kosong setiap kali mereka melakukan logout lalu login kembali.
 2) Langkah reproduksi: Pengguna mengunggah foto, berhasil. Tapi saat mencoba logout dan login lagi, foto profil gagal termuat karena data tidak tersimpan di sesi.
 3) Hipotesis penyebab: Logika query pengambilan data saat login tidak menyertakan pemanggilan (select) atribut 'avatar' dari database, sehingga session foto selalu kosong.
 4) Fix (apa yang diubah): Menambahkan pemanggilan kolom `avatar` pada sintaks SQL query dan menyimpannya ke `$_SESSION['avatar']`.
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 2](bug/bug2.png)
-
+```text
 Bug Log 3 (Foto Sidebar Tidak Real-time)
 1) Gejala: Setelah yayasan mengunggah foto profil baru, foto di sudut kiri bawah (sidebar footer) tidak ikut berubah secara instan sebelum halaman di-refresh manual.
 2) Langkah reproduksi: Yayasan mengubah profil, muncul notifikasi sukses, tapi foto sidebar lama tetap tampil tidak sinkron.
 3) Hipotesis penyebab: Fungsi JavaScript untuk proses unggah asinkron (AJAX) hanya diprogram untuk memperbarui src elemen foto utama, namun melewatkan elemen foto di sidebar.
 4) Fix (apa yang diubah): Menambahkan logika manipulasi DOM untuk mencari dan memperbarui atribut src pada elemen gambar di dalam class `.profile-av`.
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 3](bug/bug3.png)
-
+```text
 Bug Log 4 (Kesulitan Menyalin Nomor Resi)
 1) Gejala: Pihak yayasan kerepotan dan lambat dalam menyalin nomor resi pengiriman yang panjang dari donatur, karena harus diblok manual selayaknya teks biasa.
 2) Langkah reproduksi: Yayasan membuka tabel penawaran masuk, lalu mencoba memblok teks resi untuk dilacak di website ekspedisi.
 3) Hipotesis penyebab: Teks data nomor resi dirender tanpa elemen tombol salin otomatis ke clipboard (kurangnya fitur interaktif UI).
 4) Fix (apa yang diubah): Menambahkan tombol ikon kecil dengan event listener `onclick="navigator.clipboard.writeText(...)"` di sebelah output nomor resi.
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 4](bug/bug4.png)
-
+```text
 Bug Log 5 (Menu Lacak Pengiriman Belum Ada di Dashboard Yayasan)
 1) Gejala: Menu navigasi untuk melacak pengiriman di dashboard yayasan tidak ada.
 2) Langkah reproduksi: Yayasan mencoba mencari halaman khusus untuk mengecek resi, tapi kebingungan mencarinya di menu samping.
 3) Hipotesis penyebab: Belum ada tombol (link) pintasan khusus yang diletakkan di navigasi sidebar menuju halaman lacak.
 4) Fix (apa yang diubah): Menambahkan elemen HTML tag tautan `<a>` berlabel "Lacak Pengiriman" 
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 5](bug/bug5.png)
-
+```text
 Bug Log 6 (Validasi Panjang Sandi Meleset)
 1) Gejala: Peringatan error yang membingungkan teks instruksi di kotak input tertulis minimal 6 karakter, tapi saat disubmit sistem menolak jika kurang dari 8 karakter.
 2) Langkah reproduksi: Pengguna membuat sandi 6 karakter sesuai instruksi yang terlihat (placeholder), dan pendaftaran pun digagalkan oleh sistem.
 3) Hipotesis penyebab: Atribut validasi di antarmuka (frontend) tertinggal dari pembaruan aturan di backend yang sudah dinaikkan syaratnya menjadi minimal 8 karakter.
 4) Fix (apa yang diubah): Mengubah properti parameter HTML menjadi `minlength="8"` dan petunjuk teks menjadi `placeholder="Min. 8 karakter"`.
 5) Bukti (Untuk Screenshot):
+```
 ![Bukti Bug 6](bug/bug6.png)
-
+```
+```text
 Bug Log 7 (Profil Footer Donatur Tidak Bisa Diklik)
 1) Gejala: Area foto profil dan nama donatur di pojok kiri bawah tidak merespon saat diklik, padahal umumnya area tersebut berfungsi sebagai jalan pintas menuju profil.
 2) Langkah reproduksi: Donatur mengeklik avatarnya di sidebar, tapi tidak terjadi apa-apa karena area tersebut bukan tombol.
 3) Hipotesis penyebab: Elemen tag pembungkus profil di sidebar masih berupa `<div>` blok pasif biasa, belum dibungkus oleh tag tautan `<a>`.
 4) Fix (apa yang diubah): Mengubah tag pembungkus elemen pengguna dari `<div class="sidebar-user">` menjadi tag navigasi `<a href="?tab=profil" class="sidebar-user">`.
 5) Bukti (Untuk Screenshot):
-![Bukti Bug 7](bug/bug7.png)
 ```
+![Bukti Bug 7](bug/bug7.png)
+
 
 # AI Usage Statement
 

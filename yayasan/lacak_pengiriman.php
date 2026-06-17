@@ -94,6 +94,7 @@ try {
         #toast.show{transform:translateY(0);opacity:1}
         #toast.err{background:#dc2626;color:#fff}
     </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 
@@ -105,38 +106,38 @@ try {
     </div>
     <nav class="sidebar-nav">
         <a href="dashboard_yayasan.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+            <i class="ph ph-house" style="font-size: 1.25em; vertical-align: middle;"></i>
             Dashboard
         </a>
         <a href="kelola_katalog.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            <i class="ph ph-package" style="font-size: 1.25em; vertical-align: middle;"></i>
             Katalog Kebutuhan
         </a>
         <a href="tawaran_masuk.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+            <i class="ph ph-clipboard-text" style="font-size: 1.25em; vertical-align: middle;"></i>
             Tawaran Masuk
             <?php if ($badge_menunggu > 0): ?>
                 <span class="badge"><?= $badge_menunggu ?></span>
             <?php endif; ?>
         </a>
         <a href="konfirmasi_terima.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
             Konfirmasi Terima
             <?php if ($badge_dikirim > 0): ?>
                 <span class="badge"><?= $badge_dikirim ?></span>
             <?php endif; ?>
         </a>
         <a href="lacak_pengiriman.php" class="nav-item active">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
             Lacak Pengiriman
         </a>
         <div class="nav-divider"></div>
         <a href="../backend/export_csv.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
             Laporan CSV
         </a>
         <a href="profil_yayasan.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            <i class="ph ph-user" style="font-size: 1.25em; vertical-align: middle;"></i>
             Profil &amp; Legalitas
         </a>
     </nav>
@@ -160,7 +161,7 @@ try {
             </div>
         </a>
         <a href="../backend/logout.php" class="logout-btn">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+            <i class="ph ph-sign-out" style="font-size: 1.25em; vertical-align: middle;"></i>
             Keluar
         </a>
     </div>
@@ -178,7 +179,7 @@ try {
       <div class="lacak-input-row">
         <input type="text" id="resiInput" placeholder="Contoh: JNE1234567890" value="<?=htmlspecialchars($_GET['resi']??'')?>">
         <button class="btn-lacak" onclick="lacakResi()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+          <i class="ph ph-magnifying-glass" style="font-size: 1.25em; vertical-align: middle;"></i>
           Lacak
         </button>
       </div>
@@ -196,7 +197,7 @@ try {
     </div>
     
     <div id="lacakEmpty" style="display:none;text-align:center;padding:40px;color:var(--muted)">
-      <svg width="40" height="40" fill="none" stroke="#4aad6b" stroke-width="1" viewBox="0 0 24 24" style="margin:0 auto 12px;display:block"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+      <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
       <p id="lacakErrMsg">Nomor resi tidak ditemukan di sistem.</p>
     </div>
 </main>
@@ -233,7 +234,7 @@ async function lacakResi() {
         const curr = i === data.current && !done;
         tlHtml += `<li>
           <div class="tl-dot ${done?'done':curr?'active':''}">
-            ${done?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>':'<span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;margin:auto"></span>'}
+            ${done?'<i class="ph ph-check" style="font-size: 1.25em; vertical-align: middle;"></i>':'<span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;margin:auto"></span>'}
           </div>
           <div class="tl-label" style="color:${done?'var(--moss)':curr?'var(--amber)':'var(--muted)'}">${s.label}</div>
           <div class="tl-desc">${s.desc}</div>

@@ -84,6 +84,7 @@ $activePage = 'dashboard';
 
         @media (max-width: 1100px) { .stat-grid { grid-template-columns: 1fr 1fr; } .two-col { grid-template-columns: 1fr; } }
     </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 <?php require '_sidebar.php'; ?>
@@ -102,9 +103,9 @@ $activePage = 'dashboard';
 
     <?php if ($stats['pending_verif'] > 0): ?>
     <a href="verifikasi.php" class="pending-alert">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+        <i class="ph ph-info" style="font-size: 1.25em; vertical-align: middle;"></i>
         <span><?= $stats['pending_verif'] ?> yayasan menunggu verifikasi — klik untuk meninjau</span>
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-left:auto"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <i class="ph ph-caret-right" style="font-size: 1.25em; vertical-align: middle;"></i>
     </a>
     <?php endif; ?>
 
@@ -112,7 +113,7 @@ $activePage = 'dashboard';
     <div class="stat-grid">
         <a class="stat-card" href="kelola_user.php">
             <div class="stat-icon ic-green">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                <i class="ph ph-user" style="font-size: 1.25em; vertical-align: middle;"></i>
             </div>
             <div>
                 <div class="stat-label">Total Donatur</div>
@@ -122,7 +123,7 @@ $activePage = 'dashboard';
         </a>
         <a class="stat-card" href="verifikasi.php">
             <div class="stat-icon ic-amber">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg>
+                <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
             </div>
             <div>
                 <div class="stat-label">Yayasan Terverifikasi</div>
@@ -132,7 +133,7 @@ $activePage = 'dashboard';
         </a>
         <a class="stat-card" href="kelola_donasi.php">
             <div class="stat-icon ic-blue">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                <i class="ph ph-calendar" style="font-size: 1.25em; vertical-align: middle;"></i>
             </div>
             <div>
                 <div class="stat-label">Donasi Berlangsung</div>
@@ -142,7 +143,7 @@ $activePage = 'dashboard';
         </a>
         <a class="stat-card" href="kelola_donasi.php">
             <div class="stat-icon ic-purple">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+                <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
             </div>
             <div>
                 <div class="stat-label">Barang Tersalurkan</div>

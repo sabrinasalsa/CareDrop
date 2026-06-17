@@ -1,10 +1,10 @@
 <?php
 session_start();
-if (!isset($_SESSION['id']))          { header('Location: login.php'); exit; }
-if ($_SESSION['role'] === 'admin')    { header('Location: admin/index.php'); exit; }
-if ($_SESSION['role'] === 'penerima') { header('Location: yayasan/dashboard_yayasan.php'); exit; }
+if (!isset($_SESSION['id']))          { header('Location: ../login.php'); exit; }
+if ($_SESSION['role'] === 'admin')    { header('Location: ../admin/index.php'); exit; }
+if ($_SESSION['role'] === 'penerima') { header('Location: ../yayasan/dashboard_yayasan.php'); exit; }
 
-require_once __DIR__ . '/backend/koneksi.php';
+require_once dirname(__DIR__) . '/backend/koneksi.php';
 
 // Validasi: pastikan user ID di session masih ada di database
 $_chk = $pdo->prepare("SELECT id FROM users WHERE id = ? LIMIT 1");
@@ -12,7 +12,7 @@ $_chk->execute([$_SESSION['id']]);
 $_valid = $_chk->fetch();
 if (!$_valid) {
     session_unset(); session_destroy();
-    header('Location: login.php?flash=timeout'); exit;
+    header('Location: ../login.php?flash=timeout'); exit;
 }
 
 $user_id  = (int)$_SESSION['id'];
@@ -321,6 +321,7 @@ $stMap = [
     @media(max-width:900px){.stat-grid{grid-template-columns:1fr 1fr}.prof-grid{grid-template-columns:1fr}}
     @media(max-width:640px){.sidebar{transform:translateX(-100%)}.main{margin-left:0}.stat-grid{grid-template-columns:1fr}}
   </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 
@@ -332,44 +333,44 @@ $stMap = [
   </div>
   <nav class="sidebar-nav">
     <a href="?tab=beranda"    class="nav-item <?= $tab==='beranda'   ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      <i class="ph ph-house" style="font-size: 1.25em; vertical-align: middle;"></i>
       Beranda
     </a>
     <a href="?tab=ajukan"     class="nav-item <?= $tab==='ajukan'    ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+      <i class="ph ph-calendar" style="font-size: 1.25em; vertical-align: middle;"></i>
       Ajukan Donasi
     </a>
     <a href="?tab=tawaran"    class="nav-item <?= $tab==='tawaran'   ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+      <i class="ph ph-clipboard-text" style="font-size: 1.25em; vertical-align: middle;"></i>
       Tawaran Saya
       <?php if(isset($stats['perlu_resi']) && $stats['perlu_resi']>0): ?><span class="nav-badge"><?=$stats['perlu_resi']?></span><?php endif; ?>
     </a>
     <a href="?tab=lacak"      class="nav-item <?= $tab==='lacak'     ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+      <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
       Lacak Pengiriman
     </a>
     <a href="?tab=riwayat"    class="nav-item <?= $tab==='riwayat'   ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <i class="ph ph-clock" style="font-size: 1.25em; vertical-align: middle;"></i>
       Riwayat Donasi
     </a>
     <a href="?tab=sertifikat" class="nav-item <?= $tab==='sertifikat'?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
+      <i class="ph ph-map-pin" style="font-size: 1.25em; vertical-align: middle;"></i>
       E-Sertifikat
     </a>
     <div class="nav-separator"></div>
     <a href="?tab=profil"     class="nav-item <?= $tab==='profil'    ?'active':'' ?>">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      <i class="ph ph-user" style="font-size: 1.25em; vertical-align: middle;"></i>
       Kelola Profil
     </a>
-    <a href="backend/logout.php" class="nav-item">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+    <a href="../backend/logout.php" class="nav-item">
+      <i class="ph ph-sign-out" style="font-size: 1.25em; vertical-align: middle;"></i>
       Keluar
     </a>
   </nav>
   <a href="?tab=profil" class="sidebar-user" style="text-decoration:none;">
     <div class="user-av"><?php
-      $avPath = !empty($_SESSION['avatar']) ? 'uploads/avatars/'.$_SESSION['avatar'] : null;
-      if ($avPath && file_exists(__DIR__.'/'.$avPath)): ?>
+      $avPath = !empty($_SESSION['avatar']) ? '../uploads/avatars/'.$_SESSION['avatar'] : null;
+      if ($avPath && file_exists(dirname(__DIR__).'/uploads/avatars/'.$_SESSION['avatar'])): ?>
         <img src="<?=$avPath?>" alt="">
       <?php else: ?><?=$inisial?><?php endif; ?>
     </div>
@@ -389,10 +390,7 @@ $stMap = [
       echo $titles[$tab]??'Dashboard';
     ?></h2>
     <div class="topbar-actions">
-      <a href="katalog.php" class="btn-outline" style="font-size:.8rem;padding:7px 14px">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
-        Katalog Publik
-      </a>
+      <!-- Removed Katalog Publik button since catalog is now in Ajukan Donasi tab -->
     </div>
   </div>
 
@@ -402,25 +400,25 @@ $stMap = [
     <!-- Stat Cards -->
     <div class="stat-grid">
       <div class="sc">
-        <div class="sc-icon ic-green"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
+        <div class="sc-icon ic-green"><i class="ph ph-package" style="font-size: 1.25em; vertical-align: middle;"></i></div>
         <label>Total Donasi</label><big><?=$stats['total']?></big><small>sejak bergabung</small>
       </div>
       <div class="sc">
-        <div class="sc-icon ic-amber"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="sc-icon ic-amber"><i class="ph ph-clock" style="font-size: 1.25em; vertical-align: middle;"></i></div>
         <label>Sedang Berjalan</label><big><?=$stats['berjalan']?></big><small>dalam proses</small>
       </div>
       <div class="sc">
-        <div class="sc-icon ic-green"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="sc-icon ic-green"><i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i></div>
         <label>Donasi Selesai</label><big><?=$stats['selesai']?></big><small>berhasil diterima</small>
       </div>
       <div class="sc">
-        <div class="sc-icon ic-blue"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg></div>
+        <div class="sc-icon ic-blue"><i class="ph ph-map-pin" style="font-size: 1.25em; vertical-align: middle;"></i></div>
         <label>E-Sertifikat</label><big><?=$stats['selesai']?></big><small>dapat diunduh</small>
       </div>
     </div>
     <?php if ($stats['perlu_resi']>0): ?>
     <div class="alert-resi">
-      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      <i class="ph ph-warning" style="font-size: 1.25em; vertical-align: middle;"></i>
       <p><strong><?=$stats['perlu_resi']?> tawaran disetujui</strong> — Segera masukkan nomor resi untuk melanjutkan pengiriman. <a href="?tab=tawaran">Lihat sekarang</a></p>
     </div>
     <?php endif; ?>
@@ -451,7 +449,7 @@ $stMap = [
     <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px">Pilih item kebutuhan dari yayasan terverifikasi. Setelah tawaran disetujui, Anda kirim barang sendiri dan input nomor resi.</p>
     <?php if(empty($katalog)): ?>
     <div style="text-align:center;padding:60px 20px;color:var(--muted)">
-      <div style="width:64px;height:64px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="28" height="28" fill="none" stroke="#4aad6b" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
+      <div style="width:64px;height:64px;background:#f0fdf4;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="ph ph-package" style="font-size: 1.25em; vertical-align: middle;"></i></div>
       <h3 style="font-size:1rem;font-weight:700;color:var(--body)">Semua kebutuhan sudah terpenuhi</h3>
       <p style="font-size:.82rem;margin-top:6px">Tidak ada item yang membutuhkan donasi saat ini.</p>
     </div>
@@ -468,7 +466,7 @@ $stMap = [
           <span class="urg <?=$urgCls?>"><?=$urgLbl?></span>
         </div>
         <div class="kat-yay">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>
+          <i class="ph ph-buildings" style="font-size: 1.25em; vertical-align: middle;"></i>
           <?=htmlspecialchars($k['nama_yayasan'])?><?php if($k['kota_yayasan']): ?> · <?=htmlspecialchars(mb_substr($k['kota_yayasan'],0,25))?><?php endif; ?>
         </div>
         <div class="prog-bar"><div class="prog-fill" style="width:<?=$pct?>%"></div></div>
@@ -516,7 +514,7 @@ $stMap = [
                 <a href="?tab=lacak&resi=<?=urlencode($d['no_resi'])?>" class="btn-cert">Lacak</a>
               <?php elseif($d['status_donasi']==='selesai'): ?>
                 <a href="sertifikat.php?id=<?=$d['donasi_id']?>" class="btn-cert" target="_blank">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
                   Sertifikat
                 </a>
               <?php elseif($d['status_donasi']==='ditolak' && $d['alasan_tolak']): ?>
@@ -537,7 +535,7 @@ $stMap = [
       <div class="lacak-input-row">
         <input type="text" id="resiInput" placeholder="Contoh: JNE1234567890" value="<?=htmlspecialchars($_GET['resi']??'')?>">
         <button class="btn-lacak" onclick="lacakResi()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+          <i class="ph ph-magnifying-glass" style="font-size: 1.25em; vertical-align: middle;"></i>
           Lacak
         </button>
       </div>
@@ -553,15 +551,15 @@ $stMap = [
       </div>
     </div>
     <div id="lacakEmpty" style="display:none;text-align:center;padding:40px;color:var(--muted)">
-      <svg width="40" height="40" fill="none" stroke="#4aad6b" stroke-width="1" viewBox="0 0 24 24" style="margin:0 auto 12px;display:block"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+      <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
       <p id="lacakErrMsg">Nomor resi tidak ditemukan di sistem.</p>
     </div>
 
   <?php /* ═══ RIWAYAT ═══ */ elseif($tab==='riwayat'): ?>
     <div class="section-hdr">
       <h3>Semua Riwayat Donasi (<?=count($riwayat)?>)</h3>
-      <a href="backend/export_csv.php" class="btn-outline" style="padding:7px 14px;font-size:.8rem">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+      <a href="../backend/export_csv.php" class="btn-outline" style="padding:7px 14px;font-size:.8rem">
+        <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
         Export CSV
       </a>
     </div>
@@ -593,7 +591,7 @@ $stMap = [
     <p style="font-size:.85rem;color:var(--muted);margin-bottom:20px">E-sertifikat tersedia untuk setiap donasi yang telah dikonfirmasi diterima oleh yayasan.</p>
     <?php if(empty($selesai)): ?>
     <div style="text-align:center;padding:60px 20px;color:var(--muted)">
-      <div style="width:64px;height:64px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="28" height="28" fill="none" stroke="#2563eb" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg></div>
+      <div style="width:64px;height:64px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i class="ph ph-map-pin" style="font-size: 1.25em; vertical-align: middle;"></i></div>
       <h3 style="font-size:1rem;font-weight:700;color:var(--body);margin-bottom:6px">Belum ada E-Sertifikat</h3>
       <p style="font-size:.82rem">Selesaikan donasi untuk mendapatkan e-sertifikat resmi CareDrop.</p>
     </div>
@@ -606,7 +604,7 @@ $stMap = [
         <span class="cert-qty"><?=$s['qty_donasi']?> unit</span>
         <p style="margin-bottom:12px">Selesai: <?=date('d M Y',strtotime($s['tgl_selesai']))?></p>
         <a href="sertifikat.php?id=<?=$s['donasi_id']?>" target="_blank" class="cert-dl">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
           Unduh Sertifikat
         </a>
       </div>
@@ -741,7 +739,7 @@ document.getElementById('donasiForm')?.addEventListener('submit', async function
   btn.disabled = true; btn.textContent = 'Mengirim...';
   try {
     const fd = new FormData(this);
-    const res = await fetch('backend/proses_donasi.php', {method:'POST',body:fd});
+    const res = await fetch('../backend/proses_donasi.php', {method:'POST',body:fd});
     const data = await res.json();
     if (data.ok) {
       closeModal('donasiOverlay'); this.reset();
@@ -759,7 +757,7 @@ document.getElementById('resiForm')?.addEventListener('submit', async function(e
   btn.disabled = true; btn.textContent = 'Menyimpan...';
   try {
     const fd = new FormData(this);
-    const res = await fetch('backend/aksi_tawaran.php', {method:'POST',body:fd});
+    const res = await fetch('../backend/aksi_tawaran.php', {method:'POST',body:fd});
     const data = await res.json();
     if (data.ok) {
       closeModal('resiOverlay'); this.reset();
@@ -787,7 +785,7 @@ async function lacakResi() {
   document.getElementById('lacakResult').style.display = 'none';
   document.getElementById('lacakEmpty').style.display = 'none';
   try {
-    const res = await fetch(`backend/lacak_resi.php?resi=${encodeURIComponent(resi)}`);
+    const res = await fetch(`../backend/lacak_resi.php?resi=${encodeURIComponent(resi)}`);
     const data = await res.json();
     if (data.ok && data.resi) {
       const r = data.resi;
@@ -803,7 +801,7 @@ async function lacakResi() {
         const curr = i === data.current && !done;
         tlHtml += `<li>
           <div class="tl-dot ${done?'done':curr?'active':''}">
-            ${done?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>':'<span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;margin:auto"></span>'}
+            ${done?'<i class="ph ph-check" style="font-size: 1.25em; vertical-align: middle;"></i>':'<span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block;margin:auto"></span>'}
           </div>
           <div class="tl-label" style="color:${done?'var(--moss)':curr?'var(--amber)':'var(--muted)'}">${s.label}</div>
           <div class="tl-desc">${s.desc}</div>
@@ -830,7 +828,7 @@ document.getElementById('profilForm')?.addEventListener('submit', async function
   btn.disabled = true; btn.textContent = 'Menyimpan...';
   try {
     const fd = new FormData(this);
-    const res = await fetch('backend/update_profil.php', {method:'POST',body:fd});
+    const res = await fetch('../backend/update_profil.php', {method:'POST',body:fd});
     const data = await res.json();
     if (data.ok) {
       showToast('Profil berhasil diperbarui!');
@@ -872,7 +870,7 @@ document.getElementById('passForm')?.addEventListener('submit', async function(e
   btn.disabled = true; btn.textContent = 'Mengubah...';
   try {
     const fd = new FormData(this);
-    const res = await fetch('backend/ganti_password.php', {method:'POST',body:fd});
+    const res = await fetch('../backend/ganti_password.php', {method:'POST',body:fd});
     const data = await res.json();
     if (data.ok) { this.reset(); showToast('Password berhasil diubah!'); }
     else showToast(data.error || 'Gagal mengubah password', true);
@@ -897,11 +895,11 @@ async function uploadAvatar() {
   const form = document.getElementById('avatarForm');
   const fd = new FormData(form);
   try {
-    const res = await fetch('backend/upload_avatar.php', {method:'POST',body:fd});
+    const res = await fetch('../backend/upload_avatar.php', {method:'POST',body:fd});
     const data = await res.json();
     if (data.ok) {
       // Gunakan URL dari server (bukan blob lokal) agar konsisten
-      updateAvatarUI(data.url + '?t=' + Date.now());
+      updateAvatarUI('../' + data.url + '?t=' + Date.now());
       showToast('Foto profil berhasil diperbarui!');
     } else {
       showToast(data.error || 'Gagal upload foto', true);

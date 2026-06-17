@@ -63,6 +63,6 @@ $pdo = null;
 switch ($row['role']) {
     case 'admin':    header('Location: ../admin/index.php'); break;
     case 'penerima': header('Location: ../yayasan/dashboard_yayasan.php'); break;
-    default:         header('Location: ../dashboard.php'); break;
+    default:         header('Location: ../donatur/dashboard.php'); break;
 }
 exit;

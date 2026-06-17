@@ -165,6 +165,7 @@ $pdo = null;
         @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
         @media (max-width: 900px)  { .main { padding: 20px 16px; } }
     </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 
@@ -181,7 +182,7 @@ $pdo = null;
     <?php if ($err): ?><div class="flash flash-err"><?= htmlspecialchars($err) ?></div><?php endif; ?>
 
     <div class="info-banner">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <i class="ph ph-medal" style="font-size: 1.25em; vertical-align: middle;"></i>
         <div>
             <strong>Upload Logo</strong> — Unggah logo CareDrop atau logo organisasi (PNG/JPG/SVG, maks. 2MB) yang akan tampil di bagian atas sertifikat donasi. Hanya satu templat yang bisa aktif sekaligus.
         </div>
@@ -250,7 +251,7 @@ $pdo = null;
                         <textarea name="teks_body"><?= htmlspecialchars($t['teks_body'] ?? '') ?></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
                         Simpan Perubahan
                     </button>
                 </form>
@@ -268,13 +269,13 @@ $pdo = null;
                         <div class="upload-row">
                             <input type="file" name="logo" accept=".png,.jpg,.jpeg,.svg">
                             <button type="submit" class="btn btn-outline">
-                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
                                 Upload Logo
                             </button>
                         </div>
                         <?php if (!empty($t['logo_file'])): ?>
                         <div class="logo-current">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
                             Logo aktif: <?= htmlspecialchars($t['logo_file']) ?>
                         </div>
                         <?php else: ?>

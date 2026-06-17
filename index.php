@@ -9,7 +9,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
             header('Location: yayasan/kelola_katalog.php'); exit;
         case 'donatur':
         default:
-            header('Location: dashboard.php'); exit;
+            header('Location: donatur/dashboard.php'); exit;
     }
 }
 ?>
@@ -349,7 +349,7 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 CareDrop. Dibuat dengan ❤️ untuk Indonesia.</p>
+      <p>&copy; 2026 CareDrop. Dibuat dengan Tulus untuk Indonesia.</p>
       <p style="font-size:.78rem; color:rgba(201,242,220,.2)">Menghubungkan kepedulian dengan kebutuhan nyata</p>
     </div>
   </div>

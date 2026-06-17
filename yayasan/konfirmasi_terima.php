@@ -273,6 +273,7 @@ unset($_SESSION['flash']);
             .card-actions { flex-direction: row; flex-wrap: wrap; }
         }
     </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 
@@ -284,38 +285,38 @@ unset($_SESSION['flash']);
     </div>
     <nav class="sidebar-nav">
         <a href="dashboard_yayasan.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+            <i class="ph ph-house" style="font-size: 1.25em; vertical-align: middle;"></i>
             Dashboard
         </a>
         <a href="kelola_katalog.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            <i class="ph ph-package" style="font-size: 1.25em; vertical-align: middle;"></i>
             Katalog Kebutuhan
         </a>
         <a href="tawaran_masuk.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+            <i class="ph ph-clipboard-text" style="font-size: 1.25em; vertical-align: middle;"></i>
             Tawaran Masuk
             <?php if ($badge_menunggu > 0): ?>
                 <span class="badge"><?= $badge_menunggu ?></span>
             <?php endif; ?>
         </a>
         <a href="konfirmasi_terima.php" class="nav-item active">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
             Konfirmasi Terima
             <?php if ($badge_dikirim > 0): ?>
                 <span class="badge"><?= $badge_dikirim ?></span>
             <?php endif; ?>
         </a>
         <a href="lacak_pengiriman.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
             Lacak Pengiriman
         </a>
         <div class="nav-divider"></div>
         <a href="../backend/export_csv.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            <i class="ph ph-download-simple" style="font-size: 1.25em; vertical-align: middle;"></i>
             Laporan CSV
         </a>
         <a href="profil_yayasan.php" class="nav-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+            <i class="ph ph-user" style="font-size: 1.25em; vertical-align: middle;"></i>
             Profil &amp; Legalitas
         </a>
     </nav>
@@ -339,7 +340,7 @@ unset($_SESSION['flash']);
             </div>
         </a>
         <a href="../backend/logout.php" class="logout-btn">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+            <i class="ph ph-sign-out" style="font-size: 1.25em; vertical-align: middle;"></i>
             Keluar
         </a>
     </div>
@@ -366,7 +367,7 @@ unset($_SESSION['flash']);
 
     <?php if ($filter === 'dikirim' && !empty($donasi_list)): ?>
     <div class="info-banner">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <i class="ph ph-medal" style="font-size: 1.25em; vertical-align: middle;"></i>
         <p>Klik <strong>Konfirmasi Terima</strong> setelah barang benar-benar sudah Anda terima. Tindakan ini akan menandai donasi sebagai <strong>Selesai</strong> dan memperbarui stok katalog secara otomatis.</p>
     </div>
     <?php endif; ?>
@@ -375,9 +376,7 @@ unset($_SESSION['flash']);
     <div class="card-grid">
         <?php if (empty($donasi_list)): ?>
         <div class="empty-state">
-            <svg width="60" height="60" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
             <?php if ($filter === 'dikirim'): ?>
             <p>Tidak ada paket yang sedang dalam pengiriman.</p>
             <small>Paket akan muncul di sini setelah donatur mengisi nomor resi pengiriman.</small>
@@ -395,7 +394,7 @@ unset($_SESSION['flash']);
                     <?php if (!empty($d['foto_barang'])): ?>
                         <img src="../uploads/donasi/<?= htmlspecialchars($d['foto_barang']) ?>" alt="Foto barang">
                     <?php else: ?>
-                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 18h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v10.5a1.5 1.5 0 001.5 1.5z"/></svg>
+                        <i class="ph ph-image" style="font-size: 1.25em; vertical-align: middle;"></i>
                     <?php endif; ?>
                 </div>
 
@@ -410,12 +409,12 @@ unset($_SESSION['flash']);
                         <?php endif; ?>
                         <span class="badge-kat"><?= ucfirst(htmlspecialchars($d['kategori'] ?? '-')) ?></span>
                         <span class="qty-pill">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5"/></svg>
+                            <i class="ph ph-package" style="font-size: 1.25em; vertical-align: middle;"></i>
                             <?= (int)$d['qty_donasi'] ?> unit
                         </span>
                     </div>
                     <div class="card-donatur">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+                        <i class="ph ph-user" style="font-size: 1.25em; vertical-align: middle;"></i>
                         <?= htmlspecialchars($d['nama_donatur']) ?>
                         <span class="card-kontak"> · <?= htmlspecialchars($d['email_donatur']) ?><?= $d['no_telp'] ? ' · ' . htmlspecialchars($d['no_telp']) : '' ?></span>
                     </div>
@@ -424,14 +423,14 @@ unset($_SESSION['flash']);
                     <?php if (!empty($d['no_resi'])): ?>
                     <div class="resi-box">
                         <div class="resi-icon">
-                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+                            <i class="ph ph-truck" style="font-size: 1.25em; vertical-align: middle;"></i>
                         </div>
                         <div class="resi-detail">
                             <div class="resi-label">Nomor Resi</div>
                             <div class="resi-value" style="display:flex;align-items:center;gap:6px">
                                 <?= htmlspecialchars($d['no_resi']) ?>
                                 <button type="button" onclick="navigator.clipboard.writeText('<?= htmlspecialchars($d['no_resi']) ?>').then(()=>showToast('Nomor resi berhasil disalin!'))" style="background:none;border:none;color:var(--moss);cursor:pointer;display:flex;align-items:center;padding:3px;border-radius:4px;transition:background 0.15s;" title="Salin Resi" onmouseover="this.style.background='rgba(45,122,68,0.1)'" onmouseout="this.style.background='none'">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <i class="ph ph-copy" style="font-size: 1.25em; vertical-align: middle;"></i>
                                 </button>
                             </div>
                             <div class="resi-kurir"><?= strtoupper(htmlspecialchars($d['kurir'] ?? '')) ?><?= $d['kota_asal'] ? ' · dari ' . htmlspecialchars($d['kota_asal']) : '' ?></div>
@@ -446,7 +445,7 @@ unset($_SESSION['flash']);
                     <!-- Done message -->
                     <?php if ($d['status_donasi'] === 'selesai'): ?>
                     <div class="done-box">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
                         Barang telah dikonfirmasi diterima · <?= date('d M Y', strtotime($d['updated_at'])) ?>
                     </div>
                     <?php endif; ?>
@@ -461,7 +460,7 @@ unset($_SESSION['flash']);
                         class="btn-confirm"
                         id="btn-<?= htmlspecialchars($d['id']) ?>"
                         onclick="openKonfirmasiModal('<?= htmlspecialchars($d['id']) ?>', '<?= htmlspecialchars(addslashes($d['nama_barang'])) ?>', <?= (int)$d['qty_donasi'] ?>)">
-                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
                         Konfirmasi Terima
                     </button>
                     <?php endif; ?>
@@ -477,7 +476,7 @@ unset($_SESSION['flash']);
 <div class="modal-overlay" id="modalKonfirmasi">
     <div class="modal">
         <div class="modal-icon">
-            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
         </div>
         <h2 class="modal-title">Konfirmasi Penerimaan</h2>
         <p class="modal-body" id="modalKonfirmasiBody">
@@ -488,7 +487,7 @@ unset($_SESSION['flash']);
         <div class="modal-actions">
             <button class="btn-ghost" onclick="closeModal('modalKonfirmasi')">Belum</button>
             <button class="btn-ok" id="btnKonfirmasiOk" onclick="konfirmasiTerima()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>
                 Ya, Sudah Diterima
             </button>
         </div>
@@ -511,8 +510,8 @@ function showToast(msg, type = 'success') {
     const t = document.createElement('div');
     t.className = 'toast ' + type;
     const icon = type === 'success'
-        ? '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
-        : '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        ? '<i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i>'
+        : '<i class="ph ph-x-circle" style="font-size: 1.25em; vertical-align: middle;"></i>';
     t.innerHTML = `<span class="toast-icon ${type}">${icon}</span><span class="toast-msg">${msg}</span>`;
     c.appendChild(t);
     setTimeout(() => t.remove(), 4500);
@@ -560,7 +559,7 @@ function konfirmasiTerima() {
             }
         })
         .catch(() => showToast('Terjadi kesalahan koneksi.', 'error'))
-        .finally(() => { btn.disabled = false; btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Ya, Sudah Diterima'; });
+        .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="ph ph-check-circle" style="font-size: 1.25em; vertical-align: middle;"></i> Ya, Sudah Diterima'; });
 }
 
 <?php if ($flash): ?>

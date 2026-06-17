@@ -387,6 +387,7 @@ function old(string $key, string $default = ''): string {
       .field-row { grid-template-columns: 1fr; }
     }
   </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 <div class="panel-left">
@@ -430,7 +431,7 @@ function old(string $key, string $default = ''): string {
       </div>
     <?php elseif ($flash === 'pending'): ?>
       <div class="flash" style="display:flex;align-items:flex-start;gap:10px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:14px 16px;border-radius:10px;margin-bottom:20px">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:1px;color:#d97706"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+        <i class="ph ph-warning" style="font-size: 1.25em; vertical-align: middle;"></i>
         <span><strong>Registrasi berhasil!</strong> Akun yayasan Anda sedang menunggu verifikasi admin. Kami akan menginformasikan melalui email dalam 1–3 hari kerja.</span>
       </div>
     <?php elseif ($flash === 'timeout'): ?>
@@ -453,7 +454,7 @@ function old(string $key, string $default = ''): string {
 
       <?php if ($login_error): ?>
       <div class="flash flash-err" style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;color:#dc2626"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+        <i class="ph ph-warning" style="font-size: 1.25em; vertical-align: middle;"></i>
         <span><?= htmlspecialchars($login_error, ENT_QUOTES, 'UTF-8') ?></span>
       </div>
       <?php endif; ?>
@@ -672,7 +673,7 @@ function old(string $key, string $default = ''): string {
         errBox.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:16px';
         document.getElementById('regPass').closest('.field').before(errBox);
       }
-      errBox.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg><span>Kata sandi dan konfirmasi tidak cocok!</span>';
+      errBox.innerHTML = '<i class="ph ph-warning" style="font-size: 1.25em; vertical-align: middle;"></i><span>Kata sandi dan konfirmasi tidak cocok!</span>';
       document.getElementById('regPass2').focus();
     }
   });

@@ -39,6 +39,7 @@ $selesai      = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 's
         .stat-mini-value { font-size: 28px; font-weight: 800; margin-top: 4px; line-height: 1; }
         .stat-mini-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
     </style>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/regular/style.css" />
 </head>
 <body>
 <?php require '_sidebar.php'; ?>
@@ -86,7 +87,7 @@ $selesai      = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 's
         </div>
         <div class="search-wrap">
             <div class="search-box">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+                <i class="ph ph-magnifying-glass" style="font-size: 1.25em; vertical-align: middle;"></i>
                 <input type="text" id="search-donasi" placeholder="Cari barang, donatur, atau yayasan..." oninput="applyFilter()">
             </div>
         </div>

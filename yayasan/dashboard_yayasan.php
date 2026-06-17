@@ -189,7 +189,7 @@ try {
 <!-- SIDEBAR -->
 <aside class="sidebar">
     <div class="sidebar-brand">
-        <div class="brand-name">CareDrop</div>
+        <div class="brand-name">Care<span style="color: #f59e0b;">Drop</span></div>
         <div class="brand-role">Portal Yayasan</div>
     </div>
     <nav class="sidebar-nav">

@@ -146,7 +146,11 @@ $totalRejected = count(array_filter($yayasans, fn($y) => $y['status_verifikasi']
     <div class="card">
         <div class="card-header">
             <span class="card-title">Daftar Yayasan</span>
+<<<<<<< HEAD
             <span style="font-size:12px;color:var(--muted)">Baris kuning = menunggu verifikasi</span>
+=======
+
+>>>>>>> e933184f55cd909374d0d38874848e1acac5f279
         </div>
         <div class="tab-bar">
             <button class="tab-btn active" onclick="filterStatus('semua',this)">Semua (<?= count($yayasans) ?>)</button>

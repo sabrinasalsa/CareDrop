@@ -18,9 +18,10 @@ $donasi = $pdo->query(
 $pdo = null;
 $activePage = 'donasi';
 
-$total     = count($donasi);
-$berlangsung = count(array_filter($donasi, fn($d) => !in_array($d['status_donasi'], ['selesai','dibatalkan'])));
-$selesai   = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 'selesai'));
+$aktifStatus  = ['menunggu','disetujui','dikirim','ditolak'];
+$total        = count($donasi);
+$berlangsung  = count(array_filter($donasi, fn($d) => in_array($d['status_donasi'], $aktifStatus)));
+$selesai      = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 'selesai'));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -113,7 +114,7 @@ $selesai   = count(array_filter($donasi, fn($d) => $d['status_donasi'] === 'sele
                         'dibatalkan' => ['badge-dibatalkan', 'Dibatalkan'],
                         'ditolak'    => ['badge-ditolak',    'Ditolak'],
                     ];
-                    $aktif = ['menunggu','disetujui','dikirim','ditolak'];
+                    $aktif = $aktifStatus;
                     foreach ($donasi as $d):
                         [$stCls, $stLbl] = $stMap[$d['status_donasi']] ?? ['','—'];
                         $isBerlangsung   = in_array($d['status_donasi'], $aktif);

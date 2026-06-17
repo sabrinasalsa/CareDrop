@@ -653,7 +653,7 @@ $stMap = [
           <h3>Ganti Password</h3>
           <form id="passForm">
             <div class="field"><label>Password Lama</label><input type="password" name="password_lama" placeholder="••••••••" required></div>
-            <div class="field"><label>Password Baru</label><input type="password" name="password_baru" placeholder="Minimal 6 karakter" minlength="6" required></div>
+            <div class="field"><label>Password Baru</label><input type="password" name="password_baru" placeholder="Minimal 8 karakter" minlength="8" required></div>
             <div class="field"><label>Konfirmasi Password Baru</label><input type="password" name="password_konfirm" placeholder="Ulangi password baru" required></div>
             <button type="submit" class="btn-submit">Ubah Password</button>
           </form>

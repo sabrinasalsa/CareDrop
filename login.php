@@ -546,8 +546,8 @@ function old(string $key, string $default = ''): string {
         <div class="field">
           <label>Kata Sandi</label>
           <div class="pass-wrap">
-            <input type="password" name="password" id="regPass" placeholder="Minimal 6 karakter"
-                   required minlength="6" oninput="checkStrength(this.value)">
+            <input type="password" name="password" id="regPass" placeholder="Minimal 8 karakter"
+                   required minlength="8" oninput="checkStrength(this.value)">
             <button type="button" class="pass-eye" onclick="togglePass('regPass', this)" aria-label="Tampilkan/Sembunyikan kata sandi">
               <img src="https://img.icons8.com/?size=100&id=7jqPGpoNKrdY&format=png&color=000000" alt="toggle" class="pass-eye-img">
             </button>
@@ -621,8 +621,8 @@ function old(string $key, string $default = ''): string {
     const fill = document.getElementById('strengthFill');
     const txt  = document.getElementById('strengthText');
     let score = 0;
-    if (val.length >= 6)  score++;
-    if (val.length >= 10) score++;
+    if (val.length >= 8)  score++;
+    if (val.length >= 12) score++;
     if (/[A-Z]/.test(val)) score++;
     if (/[0-9]/.test(val)) score++;
     if (/[^a-zA-Z0-9]/.test(val)) score++;

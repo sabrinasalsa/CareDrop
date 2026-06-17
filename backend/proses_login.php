@@ -37,7 +37,7 @@ if (!$row || !password_verify($password, $row['password'])) {
 
 // ── Cek status verifikasi ──
 if ($row['role'] === 'penerima' && ($row['status_verifikasi'] ?? '') === 'pending') {
-    loginError('Akun Anda masih menunggu verifikasi Admin. Kami akan menghubungi Anda segera.');
+    // Biarkan login, verifikasi dilakukan melalui dokumen
 }
 if (($row['status_verifikasi'] ?? '') === 'rejected') {
     loginError('Akun Anda telah ditolak atau dinonaktifkan. Hubungi admin CareDrop.');
@@ -53,6 +53,7 @@ $_SESSION['email']         = $row['email'];
 $_SESSION['role']          = $row['role'];
 $_SESSION['no_telp']       = $row['no_telp']  ?? '';
 $_SESSION['alamat']        = $row['alamat']   ?? '';
+$_SESSION['status_verifikasi'] = $row['status_verifikasi'] ?? '';
 $_SESSION['last_activity'] = time();
 
 $pdo = null;

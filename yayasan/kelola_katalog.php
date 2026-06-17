@@ -353,10 +353,14 @@ unset($_SESSION['flash']);
 
     <!-- TOOLBAR -->
     <div class="toolbar">
+        <?php if (($_SESSION['status_verifikasi'] ?? '') !== 'pending'): ?>
         <button class="btn-primary" onclick="openModal('modalTambah')">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
             Tambah Kebutuhan
         </button>
+        <?php else: ?>
+        <div style="font-size:13px; color:var(--red); font-weight:600;">Akun belum diverifikasi</div>
+        <?php endif; ?>
         <div class="search-box">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
             <input type="text" id="searchInput" placeholder="Cari nama barang..." oninput="filterTable()">

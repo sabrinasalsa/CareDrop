@@ -258,6 +258,14 @@ try {
         <p class="page-subtitle">Selamat datang, <?= $nama_yayasan ?> — ringkasan aktivitas yayasan Anda.</p>
     </div>
 
+    <!-- ALERT status pending -->
+    <?php if (($_SESSION['status_verifikasi'] ?? '') === 'pending'): ?>
+    <div class="alert-box" style="background: #fff1f2; border-color: #fecaca;">
+        <svg width="22" height="22" fill="none" stroke="#dc2626" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <p style="color: #991b1b;"><strong>Akun Belum Terverifikasi</strong> — Anda harus mengunggah dokumen legalitas (seperti akta pendirian, KTP pengurus, dll) di menu Profil agar akun Anda dapat diverifikasi oleh admin. <a href="profil_yayasan.php" style="color:#dc2626">Unggah sekarang</a></p>
+    </div>
+    <?php endif; ?>
+
     <!-- ALERT jika ada donasi perlu dikonfirmasi -->
     <?php if ($badge_dikirim > 0): ?>
     <div class="alert-box">

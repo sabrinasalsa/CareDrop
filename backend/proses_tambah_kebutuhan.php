@@ -10,6 +10,9 @@ if (!isset($_SESSION['id']) || $_SESSION['role'] !== 'penerima') {
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../yayasan/kelola_katalog.php'); exit;
 }
+if (($_SESSION['status_verifikasi'] ?? '') === 'pending') {
+    header('Location: ../yayasan/kelola_katalog.php?err=' . urlencode('Akun Anda belum diverifikasi admin.')); exit;
+}
 
 
 $yayasan_id  = (int)$_SESSION['id'];

@@ -146,7 +146,7 @@ $totalRejected = count(array_filter($yayasans, fn($y) => $y['status_verifikasi']
     <div class="card">
         <div class="card-header">
             <span class="card-title">Daftar Yayasan</span>
-            <span style="font-size:12px;color:var(--muted)">🟡 Baris kuning = menunggu verifikasi</span>
+            <span style="font-size:12px;color:var(--muted)">Baris kuning = menunggu verifikasi</span>
         </div>
         <div class="tab-bar">
             <button class="tab-btn active" onclick="filterStatus('semua',this)">Semua (<?= count($yayasans) ?>)</button>
@@ -187,13 +187,8 @@ $totalRejected = count(array_filter($yayasans, fn($y) => $y['status_verifikasi']
                         <td style="color:var(--muted);font-size:12px"><?= date('d M Y', strtotime($y['created_at'])) ?></td>
                         <td>
                             <div style="display:flex;gap:6px;flex-wrap:wrap">
-                                <?php if ($st === 'pending'): ?>
-                                    <a href="aksi_user.php?aksi=verif&id=<?= $y['id'] ?>" class="btn btn-green"
-                                       onclick="return confirm('Verifikasi akun <?= htmlspecialchars(addslashes($y['nama_lengkap'])) ?>?')">✓ Verifikasi</a>
-                                    <a href="aksi_user.php?aksi=tolak&id=<?= $y['id'] ?>" class="btn btn-red"
-                                       onclick="return confirm('Tolak akun ini?')">✕ Tolak</a>
-                                <?php endif; ?>
-                                <button class="btn btn-blue" onclick="lihatDokumen(<?= $y['id'] ?>, '<?= htmlspecialchars(addslashes($y['nama_lengkap'])) ?>')">📄 Dokumen</button>
+
+                                <button class="btn btn-blue" onclick="lihatDokumen(<?= $y['id'] ?>, '<?= htmlspecialchars(addslashes($y['nama_lengkap'])) ?>', '<?= $st ?>')"><img src="../uploads/icon/dokumen.png" width="14" style="vertical-align:middle;margin-right:4px;" alt="Dokumen"> Dokumen</button>
                             </div>
                         </td>
                     </tr>
@@ -212,7 +207,7 @@ $totalRejected = count(array_filter($yayasans, fn($y) => $y['status_verifikasi']
     <div class="modal-box" role="dialog" aria-modal="true">
         <div class="modal-head">
             <div>
-                <div class="modal-title">📄 Dokumen Legalitas</div>
+                <div class="modal-title"><img src="../uploads/icon/dokumen.png" width="20" style="vertical-align:text-bottom;margin-right:6px;" alt="Dokumen"> Dokumen Legalitas</div>
                 <div class="modal-subtitle" id="modal-nama-yayasan">—</div>
             </div>
             <button class="modal-close" onclick="closeModal()">✕</button>
@@ -250,10 +245,11 @@ function applyFilter() {
 }
 
 /* ── Modal Legalitas ── */
-function lihatDokumen(yayasanId, namaYayasan) {
+function lihatDokumen(yayasanId, namaYayasan, yayasanStatus) {
     const overlay  = document.getElementById('modal-legalitas');
     const body     = document.getElementById('modal-body');
     const subtitle = document.getElementById('modal-nama-yayasan');
+    const footer   = document.querySelector('.modal-footer');
 
     subtitle.textContent = namaYayasan;
     body.innerHTML = `<div class="modal-loading"><div class="spinner"></div><span style="font-size:13px;color:var(--muted)">Memuat dokumen...</span></div>`;
@@ -264,30 +260,34 @@ function lihatDokumen(yayasanId, namaYayasan) {
         .then(r => r.json())
         .then(res => {
             if (!res.ok) {
-                body.innerHTML = `<div class="doc-empty"><div style="font-size:40px;margin-bottom:10px">⚠️</div><p>${res.error || 'Gagal memuat data'}</p></div>`;
+                body.innerHTML = `<div class="doc-empty"><div style="font-size:40px;margin-bottom:10px;color:var(--red);">!</div><p>${res.error || 'Gagal memuat data'}</p></div>`;
                 return;
             }
             const info = res.yayasan;
             let html = `<div class="yayasan-strip">
-                <span>📧 <strong>${escHtml(info.email)}</strong></span>
-                <span>📞 <strong>${escHtml(info.no_telp || '—')}</strong></span>
+                <span style="display:inline-flex;align-items:center;gap:6px;"><img src="../uploads/icon/email.png" width="16" alt="Email"> <strong>${escHtml(info.email)}</strong></span>
+                <span style="display:inline-flex;align-items:center;gap:6px;"><img src="../uploads/icon/call.png" width="16" alt="Telepon"> <strong>${escHtml(info.no_telp || '—')}</strong></span>
             </div>`;
 
+            let footerHtml = '<button class="btn btn-ghost" onclick="closeModal()">Tutup</button>';
+            if (yayasanStatus === 'pending') {
+                footerHtml = `
+                    <div style="display:flex;gap:8px;margin-right:auto;">
+                        <button class="btn-doc-green" onclick="verifikasiAkun(${yayasanId}, 'verif')" style="padding:8px 16px;font-size:13px;">✓ Verifikasi Akun</button>
+                        <button class="btn-doc-red" onclick="verifikasiAkun(${yayasanId}, 'tolak')" style="padding:8px 16px;font-size:13px;">✕ Tolak Akun</button>
+                    </div>
+                ` + footerHtml;
+            }
+            footer.innerHTML = footerHtml;
+
             if (!res.data || res.data.length === 0) {
-                html += `<div class="doc-empty"><div style="font-size:40px;margin-bottom:10px">📂</div><p>Yayasan ini belum mengunggah dokumen legalitas.</p></div>`;
+                html += `<div class="doc-empty"><img src="../uploads/icon/dokumen.png" width="40" style="margin-bottom:10px;opacity:0.6;"><p>Yayasan ini belum mengunggah dokumen legalitas.</p></div>`;
             } else {
                 const statusLabel = { pending:'Menunggu', verified:'Terverifikasi', rejected:'Ditolak' };
                 html += '<div class="doc-list">';
                 res.data.forEach(doc => {
                     const tgl   = new Date(doc.created_at).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'});
-                    const ext   = doc.nama_file.split('.').pop().toUpperCase();
-                    const icon  = ext === 'PDF' ? '📄' : '🖼️';
-                    const btnTerima = doc.status !== 'verified'
-                        ? `<button class="btn-doc-green" onclick="aksiDokumen(this, ${yayasanId}, '${escHtml(doc.jenis)}', 'terima')">Terima</button>`
-                        : `<button class="btn-doc-green" disabled>Terima</button>`;
-                    const btnTolak = doc.status !== 'rejected'
-                        ? `<button class="btn-doc-red" onclick="aksiDokumen(this, ${yayasanId}, '${escHtml(doc.jenis)}', 'tolak')">Tolak</button>`
-                        : `<button class="btn-doc-red" disabled>Tolak</button>`;
+                    const icon  = '<img src="../uploads/icon/dokumen.png" width="20" alt="Dokumen">';
 
                     html += `<div class="doc-card" id="doc-card-${CSS.escape(doc.jenis)}">
                         <div class="doc-icon">${icon}</div>
@@ -297,9 +297,7 @@ function lihatDokumen(yayasanId, namaYayasan) {
                             <div class="doc-date">Diunggah: ${tgl}</div>
                         </div>
                         <div class="doc-actions">
-                            <span class="doc-status ${doc.status}" id="doc-status-${CSS.escape(doc.jenis)}">${statusLabel[doc.status] || doc.status}</span>
-                            <a href="../uploads/legalitas/${escHtml(doc.nama_file)}" target="_blank" class="doc-view">👁 Lihat</a>
-                            ${btnTerima}${btnTolak}
+                            <a href="../uploads/legalitas/${escHtml(doc.nama_file)}" target="_blank" class="doc-view">Lihat Dokumen</a>
                         </div>
                     </div>`;
                 });
@@ -310,34 +308,15 @@ function lihatDokumen(yayasanId, namaYayasan) {
         .catch(() => { body.innerHTML = `<div class="doc-empty"><p>Terjadi kesalahan koneksi.</p></div>`; });
 }
 
-function aksiDokumen(btnEl, yayasanId, jenis, aksi) {
-    if (!confirm(`Yakin ingin ${aksi === 'terima' ? 'menerima' : 'menolak'} dokumen "${jenis}"?`)) return;
-    const card = btnEl.closest('.doc-card');
-    card.querySelectorAll('button').forEach(b => b.disabled = true);
-    const fd = new FormData();
-    fd.append('yayasan_id', yayasanId); fd.append('jenis', jenis); fd.append('aksi', aksi);
-    fetch('aksi_legalitas.php', { method:'POST', body:fd })
-        .then(r => r.json())
-        .then(res => {
-            if (res.ok) {
-                const el = document.getElementById(`doc-status-${CSS.escape(jenis)}`);
-                const map = { verified:'Terverifikasi', rejected:'Ditolak', pending:'Menunggu' };
-                if (el) { el.className = `doc-status ${res.status}`; el.textContent = map[res.status]; }
-                card.querySelectorAll('button').forEach(b => {
-                    if (b.classList.contains('btn-doc-green')) b.disabled = (res.status === 'verified');
-                    if (b.classList.contains('btn-doc-red'))   b.disabled = (res.status === 'rejected');
-                });
-            } else {
-                alert('Gagal: ' + (res.error || 'Terjadi kesalahan'));
-                card.querySelectorAll('button').forEach(b => b.disabled = false);
-            }
-        })
-        .catch(() => { alert('Terjadi kesalahan koneksi.'); card.querySelectorAll('button').forEach(b => b.disabled = false); });
-}
-
 function closeModal() { document.getElementById('modal-legalitas').classList.remove('open'); document.body.style.overflow = ''; }
 function tutupModal(e) { if (e.target === document.getElementById('modal-legalitas')) closeModal(); }
 function escHtml(str) { if (!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function verifikasiAkun(id, aksi) {
+    if (!confirm(aksi === 'verif' ? 'Verifikasi akun yayasan ini sekarang?' : 'Tolak akun yayasan ini?')) return;
+    window.location.href = `aksi_user.php?aksi=${aksi}&id=${id}`;
+}
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 </body>

@@ -31,16 +31,6 @@ if (isset($_SESSION['last_activity'])) {
 }
 $_SESSION['last_activity'] = time();
 
-function require_login(string $role = ''): void {
-    if (!isset($_SESSION['id'])) {
-        header('Location: ../index.php');
-        exit;
-    }
-    if ($role !== '' && ($_SESSION['role'] ?? '') !== $role) {
-        header('Location: ../index.php');
-        exit;
-    }
-}
 
 function json_error(string $msg, int $code = 400): never {
     http_response_code($code);

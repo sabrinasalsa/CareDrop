@@ -219,10 +219,10 @@ if (isset($_SESSION['id'], $_SESSION['role'])) {
       <div class="testi-card" data-aos="fade-up" data-aos-delay="200">
         <p class="testi-text">E-sertifikat yang saya terima sangat berharga. Saya tunjukkan ke keluarga dan teman sebagai bukti bahwa kita bisa berkontribusi nyata meski dari jarak jauh.</p>
         <div class="testi-author">
-          <div class="testi-av av-a">AW</div>
+          <div class="testi-av av-a">RC</div>
           <div>
-            <strong>Andi Wijaya</strong>
-            <span>Donatur, Lombok</span>
+            <strong>Ramdhan Cahyadin</strong>
+            <span>Donatur, Taliwang</span>
           </div>
         </div>
       </div>

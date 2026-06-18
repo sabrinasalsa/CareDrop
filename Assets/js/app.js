@@ -38,32 +38,4 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
-
-/* Counter animation when stats come into view */
-const counters = document.querySelectorAll('.hstat strong, .stat-card strong');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const el  = entry.target;
-      const raw = el.textContent;
-      const num = parseFloat(raw.replace(/[^0-9.]/g, ''));
-      const suffix = raw.replace(/[0-9.]/g, '');
-      if (!isNaN(num)) {
-        let start = 0;
-        const dur  = 1400;
-        const step = 16;
-        const inc  = num / (dur / step);
-        const timer = setInterval(() => {
-          start += inc;
-          if (start >= num) { start = num; clearInterval(timer); }
-          el.textContent = (Number.isInteger(num)
-            ? Math.round(start).toLocaleString('id-ID')
-            : start.toFixed(1)) + suffix;
-        }, step);
-      }
-      observer.unobserve(el);
-    }
-  });
-}, { threshold: 0.5 });
-
-counters.forEach(c => observer.observe(c));
+

@@ -31,28 +31,6 @@ if (isset($_SESSION['last_activity'])) {
 }
 $_SESSION['last_activity'] = time();
 
-// ── CSRF token ──
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-function csrf_token(): string {
-    return $_SESSION['csrf_token'] ?? '';
-}
-
-function csrf_verify(): bool {
-    $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-    return !empty($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
-}
-
-function csrf_field(): string {
-    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') . '">';
-}
-
-/**
- * Pastikan user sudah login, jika tidak redirect ke halaman awal.
- * Opsional: cek role.
- */
 function require_login(string $role = ''): void {
     if (!isset($_SESSION['id'])) {
         header('Location: ../index.php');
@@ -64,9 +42,6 @@ function require_login(string $role = ''): void {
     }
 }
 
-/**
- * Kirim JSON error dan exit – digunakan di endpoint AJAX.
- */
 function json_error(string $msg, int $code = 400): never {
     http_response_code($code);
     echo json_encode(['ok' => false, 'error' => $msg]);

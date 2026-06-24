@@ -337,3 +337,15 @@ solusi perbaikan bug pada fitur profil footer, panduan migrasi koneksi database 
 
 **5) Bagian yang saya ubah + alasan:**
 Kami mengubah dari mysqli ke PDO karena mengetahui ketentuan project memakai PDO, Bagian Ekspedisi kami hapus total dan kami ganti dengan fitur pengiriman yang mudah untuk digunakan, cukup dengan memasukkan resi pengiriman secara manual.  
+
+# Screenshots Web
+
+### 1. Halaman Donatur
+<img src="bug/donatur.png" alt="Screenshot Donatur" width="400">
+
+### 2. Halaman Yayasan
+<img src="bug/yayasan.png" alt="Screenshot Yayasan" width="400">
+
+### 3. Halaman Admin
+<img src="bug/admin.png" alt="Screenshot Admin" width="400">
+
